@@ -138,7 +138,7 @@ exports.unpad = exports.stripZeros = function (a) {
   return a
 }
 /**
- * Attempts to turn a value into a `Buffer`. As input it supports `Buffer`, `String`, `Number`, null/undefined, `BN` and other objects with a `toArray()` method.
+ * Attempts to turn a value into a `Buffer`. As input it supports `Buffer`, `String`, `Number`, null/undefined, `BN` and other objects with a `toArray()` or `toBuffer()` method.
  * @method toBuffer
  * @param {*} v the value
  */
@@ -156,8 +156,9 @@ exports.toBuffer = function (v) {
       v = exports.intToBuffer(v)
     } else if (v === null || v === undefined) {
       v = new Buffer([])
+    } else if (v.toBuffer) {
+      v = v.toBuffer()
     } else if (v.toArray) {
-      // converts a BN to a Buffer
       v = new Buffer(v.toArray())
     } else {
       throw new Error('invalid type')
@@ -226,7 +227,7 @@ exports.fromSigned = function (num) {
  * @return {Buffer}
  */
 exports.toUnsigned = function (num) {
-  return new Buffer(num.toTwos(256).toArray())
+  return num.toTwos(256).toBuffer()
 }
 
 /**
@@ -341,7 +342,7 @@ exports.generateAddress = function (from, nonce) {
     // read the RLP documentation for an answer if you dare
     nonce = null
   } else {
-    nonce = new Buffer(nonce.toArray())
+    nonce = nonce.toBuffer()
   }
 
   // Only take the lower 160bits of the hash
