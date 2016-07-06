@@ -383,7 +383,7 @@ exports.ecsign = function (msgHash, privateKey) {
   var ret = {}
   ret.r = sig.signature.slice(0, 32)
   ret.s = sig.signature.slice(32, 64)
-  ret.v = sig.recovery + 27
+  ret.v = sig.recovery
   return ret
 }
 
