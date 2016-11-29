@@ -181,7 +181,7 @@ exports.intToHex = function (i) {
  */
 exports.intToBuffer = function (i) {
   var hex = exports.intToHex(i)
-  return Buffer.from(hex.slice(2), 'hex')
+  return Buffer.from(exports.padToEven(hex.slice(2)), 'hex')
 }
 
 /**
