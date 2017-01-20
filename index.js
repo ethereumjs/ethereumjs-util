@@ -360,6 +360,32 @@ exports.ecsign = function (msgHash, privateKey) {
 }
 
 /**
+ * Returns the keccak-256 hash of `message`, prefixed with the header used by the `eth_sign` RPC call.
+ * The output of this function can be fed into `ecsign` to produce the same signature as the `eth_sign`
+ * call for a given `message`, or fed to `ecrecover` along with a signature to recover the public key
+ * used to produce the signature.
+ * @param message
+ * @returns {Buffer} hash
+ */
+exports.hashForEthSign = function (message) {
+  var prefix = exports.toBuffer('\u0019Ethereum Signed Message:\n' + message.length.toString())
+  return exports.sha3(Buffer.concat([prefix, message]))
+}
+
+/**
+ * ECDSA sign `message` using the same algorithm as the `eth_sign` RPC method.
+ * Prefixes message with fixed header + `message.length.toString()`, then
+ * signs the Keccak256 hash of the result.
+ * @param {Buffer} message
+ * @param {Buffer} privateKey
+ * @return {Object} signature
+ */
+exports.ethSign = function (message, privateKey) {
+  var msgHash = exports.hashForEthSign(message)
+  return exports.ecsign(msgHash, privateKey)
+}
+
+/**
  * ECDSA public key recovery from signature
  * @param {Buffer} msgHash
  * @param {Number} v
@@ -375,6 +401,19 @@ exports.ecrecover = function (msgHash, v, r, s) {
   }
   var senderPubKey = secp256k1.recover(msgHash, signature, recovery)
   return secp256k1.publicKeyConvert(senderPubKey, false).slice(1)
+}
+
+/**
+ * ECDSA public key recovery from a message signed with the `eth_sign` RPC call.
+ * @param {Buffer} message
+ * @param {Number} v
+ * @param {Buffer} r
+ * @param {Buffer} s
+ * @returns {Buffer} publicKey
+ */
+exports.ethRecover = function (message, v, r, s) {
+  var msgHash = exports.hashForEthSign(message)
+  return exports.ecrecover(msgHash, v, r, s)
 }
 
 /**

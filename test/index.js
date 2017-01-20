@@ -479,6 +479,31 @@ describe('ecrecover', function () {
   })
 })
 
+describe('hashForEthSign', function () {
+  it('should produce a deterministic hash', function () {
+    var h = ethUtils.hashForEthSign(Buffer.from('Hello world'))
+    assert.deepEqual(h, Buffer.from('8144a6fa26be252b86456491fbcd43c1de7e022241845ffea1c3df066f7cfede', 'hex'))
+  })
+})
+
+describe('ethSign', function () {
+  it('should produce a signature', function () {
+    var sig = ethUtils.ethSign(Buffer.from('Hello world'), ecprivkey)
+    assert.deepEqual(sig.r, Buffer.from('157098a1d96fad0945d44978e3c8f2d1d2410f8ed742652cbf13b6b031391e87', 'hex'))
+    assert.deepEqual(sig.s, Buffer.from('28521ff547f3c3242084d0d26f560a6ff1c91988d70d3284ff96f32caa373d78', 'hex'))
+    assert.equal(sig.v, 27)
+  })
+})
+
+describe('ethRecover', function () {
+  it('should recover a public key', function () {
+    var r = Buffer.from('157098a1d96fad0945d44978e3c8f2d1d2410f8ed742652cbf13b6b031391e87', 'hex')
+    var s = Buffer.from('28521ff547f3c3242084d0d26f560a6ff1c91988d70d3284ff96f32caa373d78', 'hex')
+    var pubkey = ethUtils.ethRecover(Buffer.from('Hello world'), 27, r, s)
+    assert.deepEqual(pubkey, ethUtils.privateToPublic(ecprivkey))
+  })
+})
+
 describe('isValidSignature', function () {
   it('should fail on an invalid signature (shorter r))', function () {
     var r = Buffer.from('99e71a99cb2270b8cac5254f9e99b6210c6c10224a1579cf389ef88b20a1ab', 'hex')
