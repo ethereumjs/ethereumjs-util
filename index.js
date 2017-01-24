@@ -367,7 +367,7 @@ exports.ecsign = function (msgHash, privateKey) {
  * @param message
  * @returns {Buffer} hash
  */
-exports.hashForEthSign = function (message) {
+exports.hashPersonalMessage = function (message) {
   var prefix = exports.toBuffer('\u0019Ethereum Signed Message:\n' + message.length.toString())
   return exports.sha3(Buffer.concat([prefix, message]))
 }

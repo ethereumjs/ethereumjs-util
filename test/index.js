@@ -479,9 +479,9 @@ describe('ecrecover', function () {
   })
 })
 
-describe('hashForEthSign', function () {
+describe('hashPersonalMessage', function () {
   it('should produce a deterministic hash', function () {
-    var h = ethUtils.hashForEthSign(Buffer.from('Hello world'))
+    var h = ethUtils.hashPersonalMessage(Buffer.from('Hello world'))
     assert.deepEqual(h, Buffer.from('8144a6fa26be252b86456491fbcd43c1de7e022241845ffea1c3df066f7cfede', 'hex'))
   })
 })
