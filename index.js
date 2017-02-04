@@ -170,9 +170,6 @@ exports.intToHex = function (i) {
   assert(i % 1 === 0, 'number is not a integer')
   assert(i >= 0, 'number must be positive')
   var hex = i.toString(16)
-  if (hex.length % 2) {
-    hex = '0' + hex
-  }
 
   return '0x' + hex
 }
@@ -184,7 +181,7 @@ exports.intToHex = function (i) {
  */
 exports.intToBuffer = function (i) {
   var hex = exports.intToHex(i)
-  return Buffer.from(hex.slice(2), 'hex')
+  return Buffer.from(exports.padToEven(hex.slice(2)), 'hex')
 }
 
 /**
