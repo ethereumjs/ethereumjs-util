@@ -348,6 +348,20 @@ exports.hashPersonalMessage = function (message) {
 }
 
 /**
+ * Returns the address corresponding to the `personal_sign`-formatted `signature` for the `message`.
+ * @param message
+ * @param signature
+ * @returns {Buffer} hash
+ */
+
+exports.recoverPersonalMessage = function (message, signature) {
+  const msgHash = exports.hashPersonalMessage(message)
+  const sigParams = exports.fromRpcSig(signature)
+  const sender = exports.ecrecover(msgHash, sigParams.v, sigParams.r, sigParams.s)
+  return sender
+}
+
+/**
  * ECDSA public key recovery from signature
  * @param {Buffer} msgHash
  * @param {Number} v
