@@ -299,8 +299,8 @@ exports.pubToAddress = exports.publicToAddress = function (pubKey, sanitize) {
  * @param {Buffer} privateKey A private key must be 256 bits wide
  * @return {Buffer}
  */
-var privateToPublic = exports.privateToPublic = function (privateKey) {
-  privateKey = exports.toBuffer(privateKey)
+exports.privateToPublic = function (privateKey) {
+  privateKey = exports.toBuffer(exports.addHexPrefix(privateKey))
   // skip the type flag and use the X, Y points
   return secp256k1.publicKeyCreate(privateKey, false).slice(1)
 }
@@ -420,7 +420,7 @@ exports.fromRpcSig = function (sig) {
  * @return {Buffer}
  */
 exports.privateToAddress = function (privateKey) {
-  return exports.publicToAddress(privateToPublic(privateKey))
+  return exports.publicToAddress(exports.privateToPublic(privateKey))
 }
 
 /**
