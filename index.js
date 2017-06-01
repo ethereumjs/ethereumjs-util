@@ -286,7 +286,7 @@ exports.isValidPublic = function (publicKey, sanitize) {
  */
 exports.pubToAddress = exports.publicToAddress = function (pubKey, sanitize) {
   pubKey = exports.toBuffer(pubKey)
-  if (sanitize && (pubKey.length !== 64)) {
+  if (sanitize || (pubKey.length !== 64)) {
     pubKey = secp256k1.publicKeyConvert(pubKey, false).slice(1)
   }
   assert(pubKey.length === 64)
