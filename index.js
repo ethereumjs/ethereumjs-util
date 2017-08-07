@@ -328,6 +328,10 @@ exports.importPublic = function (publicKey) {
 exports.ecsign = function (msgHash, privateKey) {
   var sig = secp256k1.sign(msgHash, privateKey)
 
+  if (sig.recovery === undefined) {
+    sig.recovery = 0
+  }
+
   var ret = {}
   ret.r = sig.signature.slice(0, 32)
   ret.s = sig.signature.slice(32, 64)
