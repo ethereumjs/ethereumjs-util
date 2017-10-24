@@ -84,6 +84,27 @@ exports.zeros = function (bytes) {
 }
 
 /**
+  * Returns a zero address
+  * @method zeroAddress
+  * @return {Buffer}
+  */
+exports.zeroAddress = function () {
+  const addressLength = 20
+  const zeroAddress = exports.zeros(addressLength)
+  return exports.bufferToHex(zeroAddress)
+}
+
+/**
+  * Checks if a given address is a zero address
+  * @method isZeroAddress
+  * @return {Boolean}
+  */
+exports.isZeroAddress = function (address) {
+  const zeroAddress = exports.zeroAddress()
+  return zeroAddress === exports.addHexPrefix(address)
+}
+
+/**
  * Left Pads an `Array` or `Buffer` with leading zeros till it has `length` bytes.
  * Or it truncates the beginning if it exceeds.
  * @method lsetLength
