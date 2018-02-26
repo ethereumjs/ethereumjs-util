@@ -115,7 +115,7 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babelify": "^8.0.0",
-    "browserify": "^14.0.0",
+    "browserify": "^15.0.0",
     "contributor": "^0.1.25",
     "coveralls": "^3.0.0",
     "documentation": "^5.2.0",
