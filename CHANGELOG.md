@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 
+## [6.0.0] - 2018-04-27
+- Rename all ``sha3`` hash related constants and functions to ``keccak``, see
+  [this](https://github.com/ethereum/EIPs/issues/59) EIP discussion for context
+  (tl;dr: Ethereum uses a slightly different hash algorithm then in the official
+  ``SHA-3`` standard)
+- Renamed constants:
+  - ``SHA3_NULL_S`` -> ``KECCAK256_NULL_S``
+  - ``SHA3_NULL`` -> ``KECCAK256_NULL``
+  - ``SHA3_RLP_ARRAY_S`` -> ``KECCAK256_RLP_ARRAY_S``
+  - ``SHA3_RLP_ARRAY`` -> ``KECCAK256_RLP_ARRAY``
+  - ``SHA3_RLP_S`` -> ``KECCAK256_RLP_S``
+  - ``SHA3_RLP`` -> ``KECCAK256_RLP``
+- Renamed functions:
+  - ``sha3()`` -> ``keccak()`` (number of bits determined in arguments)
+- The usage of the ``sha``-named versions is now ``DEPRECATED`` and the related 
+  constants and functions will be removed on the next major release ``v7.0.0``
+
+[6.0.0]: https://github.com/ethereumjs/ethereumjs-util/compare/v5.1.5...v6.0.0
+
 ## [5.1.5] - 2018-02-28
 - Fix ``browserify`` issue leading to 3rd-party build problems, PR [#119](https://github.com/ethereumjs/ethereumjs-util/pull/119)
 
