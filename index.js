@@ -86,7 +86,7 @@ exports.secp256k1 = secp256k1
  * @return {Buffer}
  */
 exports.zeros = function (bytes) {
-  return Buffer.allocUnsafe(bytes).fill(0)
+    return Buffer.allocUnsafe(bytes).fill(0)
 }
 
 /**
@@ -95,9 +95,9 @@ exports.zeros = function (bytes) {
   * @return {String}
   */
 exports.zeroAddress = function () {
-  const addressLength = 20
-  const zeroAddress = exports.zeros(addressLength)
-  return exports.bufferToHex(zeroAddress)
+    const addressLength = 20
+    const zeroAddress = exports.zeros(addressLength)
+    return exports.bufferToHex(zeroAddress)
 }
 
 /**
@@ -110,21 +110,21 @@ exports.zeroAddress = function () {
  * @return {Buffer|Array}
  */
 exports.setLengthLeft = exports.setLength = function (msg, length, right) {
-  const buf = exports.zeros(length)
-  msg = exports.toBuffer(msg)
-  if (right) {
-    if (msg.length < length) {
-      msg.copy(buf)
-      return buf
+    const buf = exports.zeros(length)
+    msg = exports.toBuffer(msg)
+    if (right) {
+        if (msg.length < length) {
+            msg.copy(buf)
+            return buf
+        }
+        return msg.slice(0, length)
+    } else {
+        if (msg.length < length) {
+            msg.copy(buf, length - msg.length)
+            return buf
+        }
+        return msg.slice(-length)
     }
-    return msg.slice(0, length)
-  } else {
-    if (msg.length < length) {
-      msg.copy(buf, length - msg.length)
-      return buf
-    }
-    return msg.slice(-length)
-  }
 }
 
 /**
@@ -135,7 +135,7 @@ exports.setLengthLeft = exports.setLength = function (msg, length, right) {
  * @return {Buffer|Array}
  */
 exports.setLengthRight = function (msg, length) {
-  return exports.setLength(msg, length, true)
+    return exports.setLength(msg, length, true)
 }
 
 /**
@@ -144,42 +144,42 @@ exports.setLengthRight = function (msg, length) {
  * @return {Buffer|Array|String}
  */
 exports.unpad = exports.stripZeros = function (a) {
-  a = exports.stripHexPrefix(a)
-  let first = a[0]
-  while (a.length > 0 && first.toString() === '0') {
-    a = a.slice(1)
-    first = a[0]
-  }
-  return a
+    a = exports.stripHexPrefix(a)
+    let first = a[0]
+    while (a.length > 0 && first.toString() === '0') {
+        a = a.slice(1)
+        first = a[0]
+    }
+    return a
 }
 /**
  * Attempts to turn a value into a `Buffer`. As input it supports `Buffer`, `String`, `Number`, null/undefined, `BN` and other objects with a `toArray()` method.
  * @param {*} v the value
  */
 exports.toBuffer = function (v) {
-  if (!Buffer.isBuffer(v)) {
-    if (Array.isArray(v)) {
-      v = Buffer.from(v)
-    } else if (typeof v === 'string') {
-      if (exports.isHexString(v)) {
-        v = Buffer.from(exports.padToEven(exports.stripHexPrefix(v)), 'hex')
-      } else {
-        v = Buffer.from(v)
-      }
-    } else if (typeof v === 'number') {
-      v = exports.intToBuffer(v)
-    } else if (v === null || v === undefined) {
-      v = Buffer.allocUnsafe(0)
-    } else if (BN.isBN(v)) {
-      v = v.toArrayLike(Buffer)
-    } else if (v.toArray) {
-      // converts a BN to a Buffer
-      v = Buffer.from(v.toArray())
-    } else {
-      throw new Error('invalid type')
+    if (!Buffer.isBuffer(v)) {
+        if (Array.isArray(v)) {
+            v = Buffer.from(v)
+        } else if (typeof v === 'string') {
+            if (exports.isHexString(v)) {
+                v = Buffer.from(exports.padToEven(exports.stripHexPrefix(v)), 'hex')
+            } else {
+                v = Buffer.from(v)
+            }
+        } else if (typeof v === 'number') {
+            v = exports.intToBuffer(v)
+        } else if (v === null || v === undefined) {
+            v = Buffer.allocUnsafe(0)
+        } else if (BN.isBN(v)) {
+            v = v.toArrayLike(Buffer)
+        } else if (v.toArray) {
+            // converts a BN to a Buffer
+            v = Buffer.from(v.toArray())
+        } else {
+            throw new Error('invalid type')
+        }
     }
-  }
-  return v
+    return v
 }
 
 /**
@@ -189,7 +189,7 @@ exports.toBuffer = function (v) {
  * @throws If the input number exceeds 53 bits.
  */
 exports.bufferToInt = function (buf) {
-  return new BN(exports.toBuffer(buf)).toNumber()
+    return new BN(exports.toBuffer(buf)).toNumber()
 }
 
 /**
@@ -198,8 +198,8 @@ exports.bufferToInt = function (buf) {
  * @return {String}
  */
 exports.bufferToHex = function (buf) {
-  buf = exports.toBuffer(buf)
-  return '0x' + buf.toString('hex')
+    buf = exports.toBuffer(buf)
+    return '0x' + buf.toString('hex')
 }
 
 /**
@@ -208,7 +208,7 @@ exports.bufferToHex = function (buf) {
  * @return {BN}
  */
 exports.fromSigned = function (num) {
-  return new BN(num).fromTwos(256)
+    return new BN(num).fromTwos(256)
 }
 
 /**
@@ -217,7 +217,7 @@ exports.fromSigned = function (num) {
  * @return {Buffer}
  */
 exports.toUnsigned = function (num) {
-  return Buffer.from(num.toTwos(256).toArray())
+    return Buffer.from(num.toTwos(256).toArray())
 }
 
 /**
@@ -227,10 +227,10 @@ exports.toUnsigned = function (num) {
  * @return {Buffer}
  */
 exports.keccak = function (a, bits) {
-  a = exports.toBuffer(a)
-  if (!bits) bits = 256
+    a = exports.toBuffer(a)
+    if (!bits) bits = 256
 
-  return createKeccakHash('keccak' + bits).update(a).digest()
+    return createKeccakHash('keccak' + bits).update(a).digest()
 }
 
 /**
@@ -239,7 +239,7 @@ exports.keccak = function (a, bits) {
  * @return {Buffer}
  */
 exports.keccak256 = function (a) {
-  return exports.keccak(a)
+    return exports.keccak(a)
 }
 
 /**
@@ -256,8 +256,8 @@ exports.sha3 = exports.keccak
  * @return {Buffer}
  */
 exports.sha256 = function (a) {
-  a = exports.toBuffer(a)
-  return createHash('sha256').update(a).digest()
+    a = exports.toBuffer(a)
+    return createHash('sha256').update(a).digest()
 }
 
 /**
@@ -267,13 +267,13 @@ exports.sha256 = function (a) {
  * @return {Buffer}
  */
 exports.ripemd160 = function (a, padded) {
-  a = exports.toBuffer(a)
-  const hash = createHash('rmd160').update(a).digest()
-  if (padded === true) {
-    return exports.setLength(hash, 32)
-  } else {
-    return hash
-  }
+    a = exports.toBuffer(a)
+    const hash = createHash('rmd160').update(a).digest()
+    if (padded === true) {
+        return exports.setLength(hash, 32)
+    } else {
+        return hash
+    }
 }
 
 /**
@@ -282,7 +282,7 @@ exports.ripemd160 = function (a, padded) {
  * @return {Buffer}
  */
 exports.rlphash = function (a) {
-  return exports.keccak(rlp.encode(a))
+    return exports.keccak(rlp.encode(a))
 }
 
 /**
@@ -291,7 +291,7 @@ exports.rlphash = function (a) {
  * @return {Boolean}
  */
 exports.isValidPrivate = function (privateKey) {
-  return secp256k1.privateKeyVerify(privateKey)
+    return secp256k1.privateKeyVerify(privateKey)
 }
 
 /**
@@ -302,16 +302,16 @@ exports.isValidPrivate = function (privateKey) {
  * @return {Boolean}
  */
 exports.isValidPublic = function (publicKey, sanitize) {
-  if (publicKey.length === 64) {
-    // Convert to SEC1 for secp256k1
-    return secp256k1.publicKeyVerify(Buffer.concat([ Buffer.from([4]), publicKey ]))
-  }
+    if (publicKey.length === 64) {
+        // Convert to SEC1 for secp256k1
+        return secp256k1.publicKeyVerify(Buffer.concat([Buffer.from([4]), publicKey]))
+    }
 
-  if (!sanitize) {
-    return false
-  }
+    if (!sanitize) {
+        return false
+    }
 
-  return secp256k1.publicKeyVerify(publicKey)
+    return secp256k1.publicKeyVerify(publicKey)
 }
 
 /**
@@ -322,13 +322,13 @@ exports.isValidPublic = function (publicKey, sanitize) {
  * @return {Buffer}
  */
 exports.pubToAddress = exports.publicToAddress = function (pubKey, sanitize) {
-  pubKey = exports.toBuffer(pubKey)
-  if (sanitize && (pubKey.length !== 64)) {
-    pubKey = secp256k1.publicKeyConvert(pubKey, false).slice(1)
-  }
-  assert(pubKey.length === 64)
-  // Only take the lower 160bits of the hash
-  return exports.keccak(pubKey).slice(-20)
+    pubKey = exports.toBuffer(pubKey)
+    if (sanitize && (pubKey.length !== 64)) {
+        pubKey = secp256k1.publicKeyConvert(pubKey, false).slice(1)
+    }
+    assert(pubKey.length === 64)
+    // Only take the lower 160bits of the hash
+    return exports.keccak(pubKey).slice(-20)
 }
 
 /**
@@ -337,9 +337,9 @@ exports.pubToAddress = exports.publicToAddress = function (pubKey, sanitize) {
  * @return {Buffer}
  */
 const privateToPublic = exports.privateToPublic = function (privateKey) {
-  privateKey = exports.toBuffer(privateKey)
-  // skip the type flag and use the X, Y points
-  return secp256k1.publicKeyCreate(privateKey, false).slice(1)
+    privateKey = exports.toBuffer(privateKey)
+    // skip the type flag and use the X, Y points
+    return secp256k1.publicKeyCreate(privateKey, false).slice(1)
 }
 
 /**
@@ -348,11 +348,11 @@ const privateToPublic = exports.privateToPublic = function (privateKey) {
  * @return {Buffer}
  */
 exports.importPublic = function (publicKey) {
-  publicKey = exports.toBuffer(publicKey)
-  if (publicKey.length !== 64) {
-    publicKey = secp256k1.publicKeyConvert(publicKey, false).slice(1)
-  }
-  return publicKey
+    publicKey = exports.toBuffer(publicKey)
+    if (publicKey.length !== 64) {
+        publicKey = secp256k1.publicKeyConvert(publicKey, false).slice(1)
+    }
+    return publicKey
 }
 
 /**
@@ -362,13 +362,13 @@ exports.importPublic = function (publicKey) {
  * @return {Object}
  */
 exports.ecsign = function (msgHash, privateKey) {
-  const sig = secp256k1.sign(msgHash, privateKey)
+    const sig = secp256k1.sign(msgHash, privateKey)
 
-  const ret = {}
-  ret.r = sig.signature.slice(0, 32)
-  ret.s = sig.signature.slice(32, 64)
-  ret.v = sig.recovery + 27
-  return ret
+    const ret = {}
+    ret.r = sig.signature.slice(0, 32)
+    ret.s = sig.signature.slice(32, 64)
+    ret.v = sig.recovery + 27
+    return ret
 }
 
 /**
@@ -380,8 +380,8 @@ exports.ecsign = function (msgHash, privateKey) {
  * @returns {Buffer} hash
  */
 exports.hashPersonalMessage = function (message) {
-  const prefix = exports.toBuffer('\u0019Ethereum Signed Message:\n' + message.length.toString())
-  return exports.keccak(Buffer.concat([prefix, message]))
+    const prefix = exports.toBuffer('\u0019Ethereum Signed Message:\n' + message.length.toString())
+    return exports.keccak(Buffer.concat([prefix, message]))
 }
 
 /**
@@ -393,13 +393,13 @@ exports.hashPersonalMessage = function (message) {
  * @return {Buffer} publicKey
  */
 exports.ecrecover = function (msgHash, v, r, s) {
-  const signature = Buffer.concat([exports.setLength(r, 32), exports.setLength(s, 32)], 64)
-  const recovery = v - 27
-  if (recovery !== 0 && recovery !== 1) {
-    throw new Error('Invalid signature v value')
-  }
-  const senderPubKey = secp256k1.recover(msgHash, signature, recovery)
-  return secp256k1.publicKeyConvert(senderPubKey, false).slice(1)
+    const signature = Buffer.concat([exports.setLength(r, 32), exports.setLength(s, 32)], 64)
+    const recovery = v - 27
+    if (recovery !== 0 && recovery !== 1) {
+        throw new Error('Invalid signature v value')
+    }
+    const senderPubKey = secp256k1.recover(msgHash, signature, recovery)
+    return secp256k1.publicKeyConvert(senderPubKey, false).slice(1)
 }
 
 /**
@@ -410,18 +410,17 @@ exports.ecrecover = function (msgHash, v, r, s) {
  * @return {String} sig
  */
 exports.toRpcSig = function (v, r, s) {
-  // NOTE: with potential introduction of chainId this might need to be updated
-  if (v !== 27 && v !== 28) {
-    throw new Error('Invalid recovery id')
-  }
+    // NOTE: with potential introduction of chainId this might need to be updated
+    if (v !== 27 && v !== 28) {
+        throw new Error('Invalid recovery id')
+    }
 
-  // geth (and the RPC eth_sign method) uses the 65 byte format used by Bitcoin
-  // FIXME: this might change in the future - https://github.com/ethereum/go-ethereum/issues/2053
-  return exports.bufferToHex(Buffer.concat([
-    exports.setLengthLeft(r, 32),
-    exports.setLengthLeft(s, 32),
-    exports.toBuffer(v - 27)
-  ]))
+    // geth (and the RPC eth_sign method) uses the 65 byte format used by Bitcoin
+    return exports.bufferToHex(Buffer.concat([
+        exports.setLengthLeft(r, 32),
+        exports.setLengthLeft(s, 32),
+        exports.toBuffer(v)
+    ]))
 }
 
 /**
@@ -431,24 +430,24 @@ exports.toRpcSig = function (v, r, s) {
  * @return {Object}
  */
 exports.fromRpcSig = function (sig) {
-  sig = exports.toBuffer(sig)
+    sig = exports.toBuffer(sig)
 
-  // NOTE: with potential introduction of chainId this might need to be updated
-  if (sig.length !== 65) {
-    throw new Error('Invalid signature length')
-  }
+    // NOTE: with potential introduction of chainId this might need to be updated
+    if (sig.length !== 65) {
+        throw new Error('Invalid signature length')
+    }
 
-  let v = sig[64]
-  // support both versions of `eth_sign` responses
-  if (v < 27) {
-    v += 27
-  }
+    let v = sig[64]
+    // support both versions of `eth_sign` responses
+    if (v < 27) {
+        v += 27
+    }
 
-  return {
-    v: v,
-    r: sig.slice(0, 32),
-    s: sig.slice(32, 64)
-  }
+    return {
+        v: v,
+        r: sig.slice(0, 32),
+        s: sig.slice(32, 64)
+    }
 }
 
 /**
@@ -457,7 +456,7 @@ exports.fromRpcSig = function (sig) {
  * @return {Buffer}
  */
 exports.privateToAddress = function (privateKey) {
-  return exports.publicToAddress(privateToPublic(privateKey))
+    return exports.publicToAddress(privateToPublic(privateKey))
 }
 
 /**
@@ -466,7 +465,7 @@ exports.privateToAddress = function (privateKey) {
  * @return {Boolean}
  */
 exports.isValidAddress = function (address) {
-  return /^0x[0-9a-fA-F]{40}$/.test(address)
+    return /^0x[0-9a-fA-F]{40}$/.test(address)
 }
 
 /**
@@ -476,8 +475,8 @@ exports.isValidAddress = function (address) {
   * @return {Boolean}
   */
 exports.isZeroAddress = function (address) {
-  const zeroAddress = exports.zeroAddress()
-  return zeroAddress === exports.addHexPrefix(address)
+    const zeroAddress = exports.zeroAddress()
+    return zeroAddress === exports.addHexPrefix(address)
 }
 
 /**
@@ -486,19 +485,19 @@ exports.isZeroAddress = function (address) {
  * @return {String}
  */
 exports.toChecksumAddress = function (address) {
-  address = exports.stripHexPrefix(address).toLowerCase()
-  const hash = exports.keccak(address).toString('hex')
-  let ret = '0x'
+    address = exports.stripHexPrefix(address).toLowerCase()
+    const hash = exports.keccak(address).toString('hex')
+    let ret = '0x'
 
-  for (let i = 0; i < address.length; i++) {
-    if (parseInt(hash[i], 16) >= 8) {
-      ret += address[i].toUpperCase()
-    } else {
-      ret += address[i]
+    for (let i = 0; i < address.length; i++) {
+        if (parseInt(hash[i], 16) >= 8) {
+            ret += address[i].toUpperCase()
+        } else {
+            ret += address[i]
+        }
     }
-  }
 
-  return ret
+    return ret
 }
 
 /**
@@ -507,7 +506,7 @@ exports.toChecksumAddress = function (address) {
  * @return {Boolean}
  */
 exports.isValidChecksumAddress = function (address) {
-  return exports.isValidAddress(address) && (exports.toChecksumAddress(address) === address)
+    return exports.isValidAddress(address) && (exports.toChecksumAddress(address) === address)
 }
 
 /**
@@ -517,19 +516,19 @@ exports.isValidChecksumAddress = function (address) {
  * @return {Buffer}
  */
 exports.generateAddress = function (from, nonce) {
-  from = exports.toBuffer(from)
-  nonce = new BN(nonce)
+    from = exports.toBuffer(from)
+    nonce = new BN(nonce)
 
-  if (nonce.isZero()) {
-    // in RLP we want to encode null in the case of zero nonce
-    // read the RLP documentation for an answer if you dare
-    nonce = null
-  } else {
-    nonce = Buffer.from(nonce.toArray())
-  }
+    if (nonce.isZero()) {
+        // in RLP we want to encode null in the case of zero nonce
+        // read the RLP documentation for an answer if you dare
+        nonce = null
+    } else {
+        nonce = Buffer.from(nonce.toArray())
+    }
 
-  // Only take the lower 160bits of the hash
-  return exports.rlphash([from, nonce]).slice(-20)
+    // Only take the lower 160bits of the hash
+    return exports.rlphash([from, nonce]).slice(-20)
 }
 
 /**
@@ -538,8 +537,8 @@ exports.generateAddress = function (from, nonce) {
  * @return {Boolean}
  */
 exports.isPrecompiled = function (address) {
-  const a = exports.unpad(address)
-  return a.length === 1 && a[0] >= 1 && a[0] <= 8
+    const a = exports.unpad(address)
+    return a.length === 1 && a[0] >= 1 && a[0] <= 8
 }
 
 /**
@@ -548,11 +547,11 @@ exports.isPrecompiled = function (address) {
  * @return {String}
  */
 exports.addHexPrefix = function (str) {
-  if (typeof str !== 'string') {
-    return str
-  }
+    if (typeof str !== 'string') {
+        return str
+    }
 
-  return exports.isHexPrefixed(str) ? str : '0x' + str
+    return exports.isHexPrefixed(str) ? str : '0x' + str
 }
 
 /**
@@ -566,29 +565,29 @@ exports.addHexPrefix = function (str) {
  */
 
 exports.isValidSignature = function (v, r, s, homestead) {
-  const SECP256K1_N_DIV_2 = new BN('7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0', 16)
-  const SECP256K1_N = new BN('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141', 16)
+    const SECP256K1_N_DIV_2 = new BN('7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0', 16)
+    const SECP256K1_N = new BN('fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141', 16)
 
-  if (r.length !== 32 || s.length !== 32) {
-    return false
-  }
+    if (r.length !== 32 || s.length !== 32) {
+        return false
+    }
 
-  if (v !== 27 && v !== 28) {
-    return false
-  }
+    if (v !== 27 && v !== 28) {
+        return false
+    }
 
-  r = new BN(r)
-  s = new BN(s)
+    r = new BN(r)
+    s = new BN(s)
 
-  if (r.isZero() || r.gt(SECP256K1_N) || s.isZero() || s.gt(SECP256K1_N)) {
-    return false
-  }
+    if (r.isZero() || r.gt(SECP256K1_N) || s.isZero() || s.gt(SECP256K1_N)) {
+        return false
+    }
 
-  if ((homestead === false) && (new BN(s).cmp(SECP256K1_N_DIV_2) === 1)) {
-    return false
-  }
+    if ((homestead === false) && (new BN(s).cmp(SECP256K1_N_DIV_2) === 1)) {
+        return false
+    }
 
-  return true
+    return true
 }
 
 /**
@@ -597,15 +596,15 @@ exports.isValidSignature = function (v, r, s, homestead) {
  * @return {Array|String|null}
  */
 exports.baToJSON = function (ba) {
-  if (Buffer.isBuffer(ba)) {
-    return '0x' + ba.toString('hex')
-  } else if (ba instanceof Array) {
-    const array = []
-    for (let i = 0; i < ba.length; i++) {
-      array.push(exports.baToJSON(ba[i]))
+    if (Buffer.isBuffer(ba)) {
+        return '0x' + ba.toString('hex')
+    } else if (ba instanceof Array) {
+        const array = []
+        for (let i = 0; i < ba.length; i++) {
+            array.push(exports.baToJSON(ba[i]))
+        }
+        return array
     }
-    return array
-  }
 }
 
 /**
@@ -619,96 +618,96 @@ exports.baToJSON = function (ba) {
  * @param {*} data data to be validated against the definitions
  */
 exports.defineProperties = function (self, fields, data) {
-  self.raw = []
-  self._fields = []
+    self.raw = []
+    self._fields = []
 
-  // attach the `toJSON`
-  self.toJSON = function (label) {
-    if (label) {
-      const obj = {}
-      self._fields.forEach((field) => {
-        obj[field] = '0x' + self[field].toString('hex')
-      })
-      return obj
-    }
-    return exports.baToJSON(this.raw)
-  }
-
-  self.serialize = function serialize () {
-    return rlp.encode(self.raw)
-  }
-
-  fields.forEach((field, i) => {
-    self._fields.push(field.name)
-    function getter () {
-      return self.raw[i]
-    }
-    function setter (v) {
-      v = exports.toBuffer(v)
-
-      if (v.toString('hex') === '00' && !field.allowZero) {
-        v = Buffer.allocUnsafe(0)
-      }
-
-      if (field.allowLess && field.length) {
-        v = exports.stripZeros(v)
-        assert(field.length >= v.length, 'The field ' + field.name + ' must not have more ' + field.length + ' bytes')
-      } else if (!(field.allowZero && v.length === 0) && field.length) {
-        assert(field.length === v.length, 'The field ' + field.name + ' must have byte length of ' + field.length)
-      }
-
-      self.raw[i] = v
+    // attach the `toJSON`
+    self.toJSON = function (label) {
+        if (label) {
+            const obj = {}
+            self._fields.forEach((field) => {
+                obj[field] = '0x' + self[field].toString('hex')
+            })
+            return obj
+        }
+        return exports.baToJSON(this.raw)
     }
 
-    Object.defineProperty(self, field.name, {
-      enumerable: true,
-      configurable: true,
-      get: getter,
-      set: setter
+    self.serialize = function serialize() {
+        return rlp.encode(self.raw)
+    }
+
+    fields.forEach((field, i) => {
+        self._fields.push(field.name)
+        function getter() {
+            return self.raw[i]
+        }
+        function setter(v) {
+            v = exports.toBuffer(v)
+
+            if (v.toString('hex') === '00' && !field.allowZero) {
+                v = Buffer.allocUnsafe(0)
+            }
+
+            if (field.allowLess && field.length) {
+                v = exports.stripZeros(v)
+                assert(field.length >= v.length, 'The field ' + field.name + ' must not have more ' + field.length + ' bytes')
+            } else if (!(field.allowZero && v.length === 0) && field.length) {
+                assert(field.length === v.length, 'The field ' + field.name + ' must have byte length of ' + field.length)
+            }
+
+            self.raw[i] = v
+        }
+
+        Object.defineProperty(self, field.name, {
+            enumerable: true,
+            configurable: true,
+            get: getter,
+            set: setter
+        })
+
+        if (field.default) {
+            self[field.name] = field.default
+        }
+
+        // attach alias
+        if (field.alias) {
+            Object.defineProperty(self, field.alias, {
+                enumerable: false,
+                configurable: true,
+                set: setter,
+                get: getter
+            })
+        }
     })
 
-    if (field.default) {
-      self[field.name] = field.default
-    }
+    // if the constuctor is passed data
+    if (data) {
+        if (typeof data === 'string') {
+            data = Buffer.from(exports.stripHexPrefix(data), 'hex')
+        }
 
-    // attach alias
-    if (field.alias) {
-      Object.defineProperty(self, field.alias, {
-        enumerable: false,
-        configurable: true,
-        set: setter,
-        get: getter
-      })
-    }
-  })
+        if (Buffer.isBuffer(data)) {
+            data = rlp.decode(data)
+        }
 
-  // if the constuctor is passed data
-  if (data) {
-    if (typeof data === 'string') {
-      data = Buffer.from(exports.stripHexPrefix(data), 'hex')
-    }
+        if (Array.isArray(data)) {
+            if (data.length > self._fields.length) {
+                throw (new Error('wrong number of fields in data'))
+            }
 
-    if (Buffer.isBuffer(data)) {
-      data = rlp.decode(data)
+            // make sure all the items are buffers
+            data.forEach((d, i) => {
+                self[self._fields[i]] = exports.toBuffer(d)
+            })
+        } else if (typeof data === 'object') {
+            const keys = Object.keys(data)
+            fields.forEach((field) => {
+                if (keys.indexOf(field.name) !== -1) self[field.name] = data[field.name]
+                if (keys.indexOf(field.alias) !== -1) self[field.alias] = data[field.alias]
+            })
+        } else {
+            throw new Error('invalid data')
+        }
     }
-
-    if (Array.isArray(data)) {
-      if (data.length > self._fields.length) {
-        throw (new Error('wrong number of fields in data'))
-      }
-
-      // make sure all the items are buffers
-      data.forEach((d, i) => {
-        self[self._fields[i]] = exports.toBuffer(d)
-      })
-    } else if (typeof data === 'object') {
-      const keys = Object.keys(data)
-      fields.forEach((field) => {
-        if (keys.indexOf(field.name) !== -1) self[field.name] = data[field.name]
-        if (keys.indexOf(field.alias) !== -1) self[field.alias] = data[field.alias]
-      })
-    } else {
-      throw new Error('invalid data')
-    }
-  }
 }
