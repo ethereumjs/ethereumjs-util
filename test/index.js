@@ -444,6 +444,10 @@ describe('toBuffer', function () {
     assert.deepEqual(ethUtils.toBuffer('0x11'), Buffer.from([17]))
     assert.deepEqual(ethUtils.toBuffer('1234').toString('hex'), '31323334')
     assert.deepEqual(ethUtils.toBuffer('0x1234').toString('hex'), '1234')
+
+    assert.deepEqual(ethUtils.toBuffer('0x00').toString('hex'), '00')
+    assert.deepEqual(ethUtils.toBuffer('0x0'), Buffer.from([]))
+    assert.deepEqual(ethUtils.toBuffer('0x'), Buffer.from([]))
     // Number
     assert.deepEqual(ethUtils.toBuffer(1), Buffer.from([1]))
     // null

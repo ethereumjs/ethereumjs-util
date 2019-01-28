@@ -156,7 +156,11 @@ exports.toBuffer = function (v) {
       v = Buffer.from(v)
     } else if (typeof v === 'string') {
       if (exports.isHexString(v)) {
-        v = Buffer.from(exports.padToEven(exports.stripHexPrefix(v)), 'hex')
+        if (v === '0x0') {
+          v = Buffer.from([]) // as per geth rpc response
+        } else {
+          v = Buffer.from(exports.padToEven(exports.stripHexPrefix(v)), 'hex')
+        }
       } else {
         v = Buffer.from(v)
       }
