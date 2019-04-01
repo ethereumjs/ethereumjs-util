@@ -47,7 +47,9 @@ export const defineProperties = function(self: any, fields: any, data: any) {
         v = Buffer.allocUnsafe(0)
       }
 
-      if (field.allowLess && field.length) {
+      if (v.toString('hex') === '00' && field.allowZero && field.isQuantity) {
+          v = Buffer.from([0])
+      } else if (field.allowLess && field.length) {
         v = stripZeros(v)
         assert(
           field.length >= v.length,
