@@ -110,7 +110,7 @@
     "husky": "^2.1.0",
     "istanbul": "^0.4.1",
     "karma": "^4.0.0",
-    "karma-browserify": "^5.0.0",
+    "karma-browserify": "^6.1.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-detect-browsers": "2.2.6",
     "karma-env-preprocessor": "^0.1.1",
