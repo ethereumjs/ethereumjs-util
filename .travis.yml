@@ -1,19 +1,16 @@
 language: node_js
 node_js:
-  - "6"
   - "8"
   - "10"
-env:
-  - CXX=g++-4.8
+  - "11"
+  - "12"
 addons:
-  firefox: "latest"
+  chrome: stable
   apt:
     sources:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
-before_install:
-  - sh -e /etc/init.d/xvfb start
 env:
   global:
     - DISPLAY=:99.0

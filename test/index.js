@@ -3,6 +3,50 @@ const ethUtils = require('../dist/index.js')
 const BN = require('bn.js')
 const eip1014Testdata = require('./testdata/eip1014Examples.json')
 
+describe('constants', function() {
+  it('should match constants', function () {
+    assert.equal(
+      ethUtils.MAX_INTEGER.toString('hex'),
+      'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+    )
+
+    assert.equal(
+      ethUtils.TWO_POW256.toString('hex'),
+      '10000000000000000000000000000000000000000000000000000000000000000'
+    )
+
+    assert.equal(
+      ethUtils.KECCAK256_NULL_S,
+      'c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
+    )
+
+    assert.equal(
+      ethUtils.KECCAK256_NULL.toString('hex'),
+      'c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470'
+    )
+
+    assert.equal(
+      ethUtils.KECCAK256_RLP_ARRAY_S,
+      '1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347'
+    )
+
+    assert.equal(
+      ethUtils.KECCAK256_RLP_ARRAY.toString('hex'),
+      '1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347'
+    )
+
+    assert.equal(
+      ethUtils.KECCAK256_RLP_S,
+      '56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'
+    )
+
+    assert.equal(
+      ethUtils.KECCAK256_RLP.toString('hex'),
+      '56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421'
+    )
+  })
+})
+
 describe('zeros function', function () {
   it('should produce lots of 0s', function () {
     const z60 = ethUtils.zeros(30)
@@ -372,9 +416,11 @@ describe('privateToAddress', function () {
   })
 })
 
-describe('generateAddress', function () {
-  it('should produce an address given a public key', function () {
-    const add = ethUtils.generateAddress('990ccf8a0de58091c028d6ff76bb235ee67c1c39', 14).toString('hex')
+describe('generateAddress', function() {
+  it('should produce an address given a public key', function() {
+    const add = ethUtils
+      .generateAddress(Buffer.from('990ccf8a0de58091c028d6ff76bb235ee67c1c39', 'utf8'), 14)
+      .toString('hex')
     assert.equal(add.toString('hex'), '936a4295d8d74e310c0c95f0a63e53737b998d12')
   })
 })
@@ -440,10 +486,9 @@ describe('toBuffer', function () {
     // Array
     assert.deepEqual(ethUtils.toBuffer([]), Buffer.allocUnsafe(0))
     // String
-    assert.deepEqual(ethUtils.toBuffer('11'), Buffer.from([49, 49]))
     assert.deepEqual(ethUtils.toBuffer('0x11'), Buffer.from([17]))
-    assert.deepEqual(ethUtils.toBuffer('1234').toString('hex'), '31323334')
     assert.deepEqual(ethUtils.toBuffer('0x1234').toString('hex'), '1234')
+    assert.deepEqual(ethUtils.toBuffer('0x'), Buffer.from([]))
     // Number
     assert.deepEqual(ethUtils.toBuffer(1), Buffer.from([1]))
     // null
@@ -459,6 +504,12 @@ describe('toBuffer', function () {
     assert.throws(function () {
       ethUtils.toBuffer({ test: 1 })
     })
+  })
+
+  it('should fail with non 0x-prefixed hex strings', function() {
+    assert.throws(() => ethUtils.toBuffer('11'), '11')
+    assert.throws(() => ethUtils.toBuffer(''))
+    assert.throws(() => ethUtils.toBuffer('0xR'), '0xR')
   })
 })
 
@@ -558,6 +609,24 @@ describe('isValidSignature', function () {
     const s = Buffer.from('129ff05af364204442bdb53ab6f18a99ab48acc9326fa689f228040429e3ca66', 'hex')
     assert.equal(ethUtils.isValidSignature(29, r, s), false)
   })
+  it('should fail when on homestead and s > secp256k1n/2', function () {
+    const SECP256K1_N_DIV_2 = new BN('7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0', 16)
+
+    const r = Buffer.from('99e71a99cb2270b8cac5254f9e99b6210c6c10224a1579cf389ef88b20a1abe9', 'hex')
+    const s = Buffer.from(SECP256K1_N_DIV_2.add(new BN('1', 16)).toString(16), 'hex')
+
+    const v = 27
+    assert.equal(ethUtils.isValidSignature(v, r, s, true), false)
+  })
+  it('should not fail when not on homestead but s > secp256k1n/2', function () {
+    const SECP256K1_N_DIV_2 = new BN('7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0', 16)
+
+    const r = Buffer.from('99e71a99cb2270b8cac5254f9e99b6210c6c10224a1579cf389ef88b20a1abe9', 'hex')
+    const s = Buffer.from(SECP256K1_N_DIV_2.add(new BN('1', 16)).toString(16), 'hex')
+
+    const v = 27
+    assert.equal(ethUtils.isValidSignature(v, r, s, false), true)
+  })
   it('should work otherwise', function () {
     const r = Buffer.from('99e71a99cb2270b8cac5254f9e99b6210c6c10224a1579cf389ef88b20a1abe9', 'hex')
     const s = Buffer.from('129ff05af364204442bdb53ab6f18a99ab48acc9326fa689f228040429e3ca66', 'hex')
@@ -573,7 +642,7 @@ describe('isValidSignature', function () {
   // FIXME: add homestead test
 })
 
-const checksumAddresses = [
+const eip55ChecksumAddresses = [
   // All caps
   '0x52908400098527886E0F7030069857D2E4169EE7',
   '0x8617E340B3D01FA5F11F306F4090FD50E238070D',
@@ -587,23 +656,103 @@ const checksumAddresses = [
   '0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb'
 ]
 
+const eip1191ChecksummAddresses = {
+  1: [
+    '0x88021160c5C792225E4E5452585947470010289d',
+    '0x27b1FdB04752bBc536007a920D24ACB045561c26',
+    '0x52908400098527886e0f7030069857D2e4169EE7',
+    '0x5aaeB6053f3E94C9b9A09f33669435e7Ef1bEAed',
+    '0x8617E340b3d01FA5F11F306f4090FD50E238070d',
+    '0xd1220a0CF47C7B9Be7A2E6ba89F429762E7B9Adb',
+    '0xdBf03b407c01e7cD3CBea99509d93f8dDDC8C6fB',
+    '0xDe709F2102306220921060314715629080E2fb77',
+    '0xfb6916095Ca1dF60bB79cE92ce3ea74C37c5D359',
+  ],
+  30: [
+    '0x6549F4939460DE12611948B3F82B88C3C8975323',
+    '0x27b1FdB04752BBc536007A920D24ACB045561c26',
+    '0x3599689E6292B81B2D85451025146515070129Bb',
+    '0x52908400098527886E0F7030069857D2E4169ee7',
+    '0x5aaEB6053f3e94c9b9a09f33669435E7ef1bEAeD',
+    '0x8617E340b3D01Fa5f11f306f4090fd50E238070D',
+    '0xD1220A0Cf47c7B9BE7a2e6ba89F429762E7B9adB',
+    '0xDBF03B407c01E7CD3cBea99509D93F8Dddc8C6FB',
+    '0xDe709F2102306220921060314715629080e2FB77',
+    '0xFb6916095cA1Df60bb79ce92cE3EA74c37c5d359'
+  ],
+  31: [
+    '0x42712D45473476B98452F434E72461577D686318',
+    '0x27B1FdB04752BbC536007a920D24acB045561C26',
+    '0x3599689e6292b81b2D85451025146515070129Bb',
+    '0x52908400098527886E0F7030069857D2e4169EE7',
+    '0x5aAeb6053F3e94c9b9A09F33669435E7EF1BEaEd',
+    '0x66f9664F97F2b50f62d13eA064982F936DE76657',
+    '0x8617e340b3D01fa5F11f306F4090Fd50e238070d',
+    '0xDE709F2102306220921060314715629080e2Fb77',
+    '0xFb6916095CA1dF60bb79CE92ce3Ea74C37c5D359',
+    '0xd1220a0CF47c7B9Be7A2E6Ba89f429762E7b9adB',
+    '0xdbF03B407C01E7cd3cbEa99509D93f8dDDc8C6fB'
+  ]
+}
+
 describe('.toChecksumAddress()', function () {
-  it('should work', function () {
-    for (let i = 0; i < checksumAddresses.length; i++) {
-      let tmp = checksumAddresses[i]
-      assert.equal(ethUtils.toChecksumAddress(tmp.toLowerCase()), tmp)
-    }
+  describe("EIP55", function () {
+    it('should work', function () {
+      for (let i = 0; i < eip55ChecksumAddresses.length; i++) {
+        let tmp = eip55ChecksumAddresses[i]
+        assert.equal(ethUtils.toChecksumAddress(tmp.toLowerCase()), tmp)
+      }
+    })
+  })
+
+  describe("EIP1191", function () {
+    it('Should encode the example addresses correctly', function () {
+      for (const [chainId, addresses] of Object.entries(eip1191ChecksummAddresses)) {
+        for (const addr of addresses) {
+          assert.equal(ethUtils.toChecksumAddress(addr.toLowerCase(), chainId), addr)
+        }
+      }
+    })
   })
 })
 
 describe('.isValidChecksumAddress()', function () {
-  it('should return true', function () {
-    for (let i = 0; i < checksumAddresses.length; i++) {
-      assert.equal(ethUtils.isValidChecksumAddress(checksumAddresses[i]), true)
-    }
+  describe("EIP55", function () {
+    it('should return true', function () {
+      for (let i = 0; i < eip55ChecksumAddresses.length; i++) {
+        assert.equal(ethUtils.isValidChecksumAddress(eip55ChecksumAddresses[i]), true)
+      }
+    })
+    it('should validate', function () {
+      assert.equal(ethUtils.isValidChecksumAddress('0x2f015c60e0be116b1f0cd534704db9c92118fb6a'), false)
+    })
   })
-  it('should validate', function () {
-    assert.equal(ethUtils.isValidChecksumAddress('0x2f015c60e0be116b1f0cd534704db9c92118fb6a'), false)
+
+  describe("EIP1191", function () {
+    it('Should return true for the example addresses', function () {
+      for (const [chainId, addresses] of Object.entries(eip1191ChecksummAddresses)) {
+        for (const addr of addresses) {
+          assert.equal(ethUtils.isValidChecksumAddress(addr, chainId), true)
+        }
+      }
+    })
+
+    it("Should return false for invalid cases", function () {
+      // If we set the chain id, an EIP55 encoded address should be invalid
+      for (let i = 0; i < eip55ChecksumAddresses.length; i++) {
+        assert.equal(ethUtils.isValidChecksumAddress(eip55ChecksumAddresses[i], 1), false)
+      }
+
+      assert.equal(ethUtils.isValidChecksumAddress('0x2f015c60e0be116b1f0cd534704db9c92118fb6a', 1), false)
+    })
+
+    it("Should return false if the wrong chain id is used", function () {
+      for (const [chainId, addresses] of Object.entries(eip1191ChecksummAddresses)) {
+        for (const addr of addresses) {
+          assert.equal(ethUtils.isValidChecksumAddress(addr, chainId + 1), false)
+        }
+      }
+    })
   })
 })
 
