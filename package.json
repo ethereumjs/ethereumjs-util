@@ -119,7 +119,7 @@
     "mocha": "^6.0.0",
     "prettier": "^1.15.3",
     "tslint": "^5.12.0",
-    "typedoc": "^0.14.0",
+    "typedoc": "^0.15.1",
     "typedoc-plugin-markdown": "^1.1.21",
     "typescript": "^3.2.2",
     "typestrict": "^1.0.2"
