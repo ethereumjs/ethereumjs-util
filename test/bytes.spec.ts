@@ -188,6 +188,8 @@ describe('toBuffer', function() {
     assert.deepEqual(toBuffer(Buffer.allocUnsafe(0)), Buffer.allocUnsafe(0))
     // Array
     assert.deepEqual(toBuffer([]), Buffer.allocUnsafe(0))
+    // Uint8Array
+    assert.deepEqual(toBuffer(new Uint8Array([0x1, 0x2])), Buffer.from([0x1, 0x2]))
     // String
     assert.deepEqual(toBuffer('0x11'), Buffer.from([17]))
     assert.deepEqual(toBuffer('0x1234').toString('hex'), '1234')

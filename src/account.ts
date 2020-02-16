@@ -1,3 +1,4 @@
+const buffer = require('buffer');
 const assert = require('assert')
 const ethjsUtil = require('ethjs-util')
 const secp256k1 = require('secp256k1')
@@ -165,7 +166,7 @@ export const isValidPublic = function(publicKey: Buffer, sanitize: boolean = fal
 export const pubToAddress = function(pubKey: Buffer, sanitize: boolean = false): Buffer {
   pubKey = toBuffer(pubKey)
   if (sanitize && pubKey.length !== 64) {
-    pubKey = secp256k1.publicKeyConvert(pubKey, false).slice(1)
+    pubKey = toBuffer(secp256k1.publicKeyConvert(new Uint8Array(pubKey), false).slice(1))
   }
   assert(pubKey.length === 64)
   // Only take the lower 160bits of the hash
@@ -188,7 +189,7 @@ export const privateToAddress = function(privateKey: Buffer): Buffer {
 export const privateToPublic = function(privateKey: Buffer): Buffer {
   privateKey = toBuffer(privateKey)
   // skip the type flag and use the X, Y points
-  return secp256k1.publicKeyCreate(privateKey, false).slice(1)
+  return toBuffer(secp256k1.publicKeyCreate(privateKey, false).slice(1))
 }
 
 /**
@@ -197,7 +198,7 @@ export const privateToPublic = function(privateKey: Buffer): Buffer {
 export const importPublic = function(publicKey: Buffer): Buffer {
   publicKey = toBuffer(publicKey)
   if (publicKey.length !== 64) {
-    publicKey = secp256k1.publicKeyConvert(publicKey, false).slice(1)
+    publicKey = toBuffer(secp256k1.publicKeyConvert(publicKey, false).slice(1))
   }
   return publicKey
 }
