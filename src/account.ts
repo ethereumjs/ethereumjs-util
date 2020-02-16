@@ -1,4 +1,3 @@
-const buffer = require('buffer');
 const assert = require('assert')
 const ethjsUtil = require('ethjs-util')
 const secp256k1 = require('secp256k1')
