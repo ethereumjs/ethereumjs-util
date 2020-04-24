@@ -56,7 +56,7 @@ ___
 
 ### `Const` generateAddress2
 
-▸ **generateAddress2**(`from`: Buffer | string, `salt`: Buffer | string, `initCode`: Buffer | string): *Buffer*
+▸ **generateAddress2**(`from`: Buffer, `salt`: Buffer, `initCode`: Buffer): *Buffer*
 
 *Defined in [account.ts:95](https://github.com/ethereumjs/ethereumjs-util/blob/master/src/account.ts#L95)*
 
@@ -66,9 +66,9 @@ Generates an address for a contract created using CREATE2.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`from` | Buffer &#124; string | The address which is creating this new address |
-`salt` | Buffer &#124; string | A salt |
-`initCode` | Buffer &#124; string | The init code of the contract being created  |
+`from` | Buffer | The address which is creating this new address |
+`salt` | Buffer | A salt |
+`initCode` | Buffer | The init code of the contract being created  |
 
 **Returns:** *Buffer*
 
