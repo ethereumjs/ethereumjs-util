@@ -56,7 +56,7 @@ ___
 
 ### `Const` generateAddress2
 
-▸ **generateAddress2**(`from`: Buffer, `salt`: Buffer, `initCode`: Buffer): *Buffer*
+▸ **generateAddress2**(`from`: Buffer | string, `salt`: Buffer | string, `initCode`: Buffer | string): *Buffer*
 
 *Defined in [account.ts:95](https://github.com/ethereumjs/ethereumjs-util/blob/master/src/account.ts#L95)*
 
@@ -66,9 +66,9 @@ Generates an address for a contract created using CREATE2.
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`from` | Buffer | The address which is creating this new address |
-`salt` | Buffer | A salt |
-`initCode` | Buffer | The init code of the contract being created  |
+`from` | Buffer &#124; string | The address which is creating this new address |
+`salt` | Buffer &#124; string | A salt |
+`initCode` | Buffer &#124; string | The init code of the contract being created  |
 
 **Returns:** *Buffer*
 
@@ -116,7 +116,7 @@ ___
 
 *Defined in [account.ts:20](https://github.com/ethereumjs/ethereumjs-util/blob/master/src/account.ts#L20)*
 
-Checks if the hex-prefixed address is a valid. Accepts checksummed addresses too.
+Checks if the address is a valid. Accepts checksummed addresses too.
 
 **Parameters:**
 
@@ -134,7 +134,7 @@ ___
 
 *Defined in [account.ts:66](https://github.com/ethereumjs/ethereumjs-util/blob/master/src/account.ts#L66)*
 
-Checks if the hex-prefixed address is a valid checksummed address.
+Checks if the address is a valid checksummed address.
 
 See toChecksumAddress' documentation for details about the eip1191ChainId parameter.
 
@@ -193,7 +193,7 @@ ___
 
 *Defined in [account.ts:27](https://github.com/ethereumjs/ethereumjs-util/blob/master/src/account.ts#L27)*
 
-Checks if a given hex-prefixed address is a zero address.
+Checks if a given address is a zero address.
 
 **Parameters:**
 
@@ -267,7 +267,7 @@ ___
 
 *Defined in [account.ts:42](https://github.com/ethereumjs/ethereumjs-util/blob/master/src/account.ts#L42)*
 
-Returns a checksummed address. (Input address must be hex-prefixed.)
+Returns a checksummed address.
 
 If a eip1191ChainId is provided, the chainId will be included in the checksum calculation. This
 has the effect of checksummed addresses for one chain having invalid checksums for others.
