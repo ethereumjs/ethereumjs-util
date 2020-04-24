@@ -442,7 +442,7 @@ describe('generateAddress2: non-buffer inputs', function() {
   })
 })
 
-describe('isPrecompiled', function() {
+describe.skip('isPrecompiled', function() {
   it('should return true', function() {
     assert.equal(isPrecompiled('0000000000000000000000000000000000000001'), true)
     assert.equal(isPrecompiled('0000000000000000000000000000000000000002'), true)
