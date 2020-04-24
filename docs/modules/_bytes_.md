@@ -135,46 +135,46 @@ ___
 
 ### `Const` setLengthLeft
 
-▸ **setLengthLeft**(`msg`: any, `length`: number, `right`: boolean): *any*
+▸ **setLengthLeft**(`msg`: Buffer, `length`: number, `right`: boolean): *any*
 
 *Defined in [bytes.ts:20](https://github.com/ethereumjs/ethereumjs-util/blob/master/src/bytes.ts#L20)*
 
-Left Pads an `Array` or `Buffer` with leading zeros till it has `length` bytes.
+Left Pads a `Buffer` with leading zeros till it has `length` bytes.
 Or it truncates the beginning if it exceeds.
 
 **Parameters:**
 
 Name | Type | Default | Description |
 ------ | ------ | ------ | ------ |
-`msg` | any | - | the value to pad (Buffer|Array) |
+`msg` | Buffer | - | the value to pad (Buffer) |
 `length` | number | - | the number of bytes the output should be |
 `right` | boolean | false | whether to start padding form the left or right |
 
 **Returns:** *any*
 
-(Buffer|Array)
+(Buffer)
 
 ___
 
 ### `Const` setLengthRight
 
-▸ **setLengthRight**(`msg`: any, `length`: number): *any*
+▸ **setLengthRight**(`msg`: Buffer, `length`: number): *any*
 
 *Defined in [bytes.ts:46](https://github.com/ethereumjs/ethereumjs-util/blob/master/src/bytes.ts#L46)*
 
-Right Pads an `Array` or `Buffer` with leading zeros till it has `length` bytes.
+Right Pads a `Buffer` with leading zeros till it has `length` bytes.
 Or it truncates the beginning if it exceeds.
 
 **Parameters:**
 
 Name | Type | Description |
 ------ | ------ | ------ |
-`msg` | any | the value to pad (Buffer|Array) |
+`msg` | Buffer | the value to pad (Buffer) |
 `length` | number | the number of bytes the output should be |
 
 **Returns:** *any*
 
-(Buffer|Array)
+(Buffer)
 
 ___
 
