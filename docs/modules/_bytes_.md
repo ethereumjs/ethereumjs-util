@@ -25,14 +25,6 @@
 
 ## Variables
 
-### `Const` setLength
-
-• **setLength**: *setLengthLeft* = setLengthLeft
-
-*Defined in [bytes.ts:37](https://github.com/ethereumjs/ethereumjs-util/blob/master/src/bytes.ts#L37)*
-
-___
-
 ### `Const` stripZeros
 
 • **stripZeros**: *unpad* = unpad
