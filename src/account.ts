@@ -2,7 +2,7 @@ const ethjsUtil = require('ethjs-util')
 import * as assert from 'assert'
 import * as secp256k1 from 'secp256k1'
 import * as BN from 'bn.js'
-import { zeros, bufferToHex, unpad } from './bytes'
+import { zeros, bufferToHex } from './bytes'
 import { keccak, keccak256, rlphash } from './hash'
 import { assertIsHexString, assertIsBuffer } from './helpers'
 
