@@ -5,14 +5,15 @@
  * @packageDocumentation
  */
 
-const ethjsUtil = require('ethjs-util')
+/// <reference path="../typings/ethjs-util.d.ts"/>
+import * as ethjsUtil from 'ethjs-util'
 import * as BN from 'bn.js'
 import * as rlp from 'rlp'
 
 /**
  * [`ethjsUtil`](https://github.com/ethjs/ethjs-util)
  */
-Object.assign(exports, ethjsUtil)
+export { ethjsUtil }
 
 /**
  * [`BN`](https://github.com/indutny/bn.js)

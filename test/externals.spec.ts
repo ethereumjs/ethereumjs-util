@@ -79,7 +79,6 @@ describe('External ethjsUtil export', () => {
   it('should have all ethjsUtil methods', () => {
     const expected = [
       'arrayContainsArray',
-      'toBuffer',
       'intToBuffer',
       'getBinarySize',
       'stripHexPrefix',
@@ -95,30 +94,30 @@ describe('External ethjsUtil export', () => {
     ]
 
     expected.forEach(prop => {
-      assert.ok(src.hasOwnProperty(prop))
+      assert.ok(src.ethjsUtil.hasOwnProperty(prop))
     })
   })
 
   it('should use ethjsUtil functions correctly', () => {
     // should convert intToHex
-    assert.equal((src as any).intToHex(new src.BN(0)), '0x0')
+    assert.equal(src.ethjsUtil.intToHex(new src.BN(0).toNumber()), '0x0')
 
     // should convert intToHex
     const i = 6003400
-    const hex = (src as any).intToHex(i)
+    const hex = src.ethjsUtil.intToHex(i)
     assert.equal(hex, '0x5b9ac8')
 
     // should convert a int to a buffer
     const j = 6003400
-    const buf = (src as any).intToBuffer(j)
+    const buf = src.ethjsUtil.intToBuffer(j)
     assert.equal(buf.toString('hex'), '5b9ac8')
   })
 
   it('should handle exceptions and invalid inputs', () => {
     // should throw when invalid abi
-    assert.throws(() => (src as any).getKeys([], 3289), Error)
+    assert.throws(() => src.ethjsUtil.getKeys([], (<unknown>3289) as string), Error)
 
     // should detect invalid length hex string
-    assert.equal((src as any).isHexString('0x0', 2), false)
+    assert.equal(src.ethjsUtil.isHexString('0x0', 2), false)
   })
 })
