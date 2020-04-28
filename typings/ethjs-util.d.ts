@@ -65,5 +65,5 @@ declare module 'ethjs-util' {
   /**
    * @description check if string is hex string of specific length
    */
-  export function isHexString(value: string, length: number): boolean
+  export function isHexString(value: string, length?: number): boolean
 }
