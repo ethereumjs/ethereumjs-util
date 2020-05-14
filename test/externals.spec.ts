@@ -7,9 +7,10 @@ import * as secp256k1_export from 'secp256k1'
 import * as src from '../src'
 
 describe('External BN export', () => {
-  it('should export `BN`', () => {
-    assert.equal(src.BN, BN_export)
-  })
+  /* Test temporarily disabled as we are applying a custom patch (see comment in `src/externals.ts`) */
+  // it('should export `BN`', () => {
+  //   assert.equal(src.BN, BN_export)
+  // })
 
   it('should use a BN function correctly', () => {
     const a = new src.BN('dead', 16)
