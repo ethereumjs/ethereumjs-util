@@ -17,7 +17,16 @@ Object.assign(exports, ethjsUtil)
 /**
  * [`BN`](https://github.com/indutny/bn.js)
  */
-export { BN }
+// PatchedBN applies a temporary fix for missing `strip()` when
+// a bn.js@v4 instance uses a bn.js@v5 instance:
+// https://github.com/indutny/bn.js/issues/239#issuecomment-626237202
+class PatchedBN extends BN {
+  strip() {
+    // @ts-ignore
+    return this._strip()
+  }
+}
+export { PatchedBN as BN }
 
 /**
  * [`rlp`](https://github.com/ethereumjs/rlp)
