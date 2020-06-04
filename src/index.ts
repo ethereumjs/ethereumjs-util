@@ -1,5 +1,7 @@
-/// <reference path="../typings/ethjs-util.d.ts"/>
-import * as ethjsUtil from 'ethjs-util'
+/**
+ * Export ethjs-util methods
+ */
+export * from 'ethjs-util'
 
 /**
  * Constants
@@ -35,8 +37,3 @@ export * from './object'
  * External exports (BN, rlp, secp256k1)
  */
 export * from './externals'
-
-/**
- * Export ethjs-util methods
- */
-export * from 'ethjs-util'
