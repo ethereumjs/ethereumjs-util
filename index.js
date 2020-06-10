@@ -1,4 +1,12 @@
-const createKeccakHash = require('keccak')
+const { keccak224, keccak384, keccak256: k256, keccak512 } = require('ethereum-cryptography/keccak')
+const {
+  privateKeyVerify,
+  publicKeyCreate,
+  publicKeyVerify,
+  publicKeyConvert,
+  sign,
+} = require('ethereum-cryptography/shims/hdkey-secp256k1v3')
+const { ecdsaRecover } = require('ethereum-cryptography/secp256k1')
 const secp256k1 = require('secp256k1')
 const assert = require('assert')
 const rlp = require('rlp')
@@ -230,7 +238,23 @@ exports.keccak = function (a, bits) {
   a = exports.toBuffer(a)
   if (!bits) bits = 256
 
-  return createKeccakHash('keccak' + bits).update(a).digest()
+  switch (bits) {
+    case 224: {
+      return keccak224(a)
+    }
+    case 256: {
+      return k256(a)
+    }
+    case 384: {
+      return keccak384(a)
+    }
+    case 512: {
+      return keccak512(a)
+    }
+    default: {
+      throw new Error(`Invald algorithm: keccak${bits}`)
+    }
+  }
 }
 
 /**
@@ -291,7 +315,11 @@ exports.rlphash = function (a) {
  * @return {Boolean}
  */
 exports.isValidPrivate = function (privateKey) {
-  return secp256k1.privateKeyVerify(privateKey)
+  try {
+    return privateKeyVerify(privateKey)
+  } catch (e) {
+    return false
+  }
 }
 
 /**
@@ -304,14 +332,14 @@ exports.isValidPrivate = function (privateKey) {
 exports.isValidPublic = function (publicKey, sanitize) {
   if (publicKey.length === 64) {
     // Convert to SEC1 for secp256k1
-    return secp256k1.publicKeyVerify(Buffer.concat([ Buffer.from([4]), publicKey ]))
+    return publicKeyVerify(Buffer.concat([ Buffer.from([4]), publicKey ]))
   }
 
   if (!sanitize) {
     return false
   }
 
-  return secp256k1.publicKeyVerify(publicKey)
+  return publicKeyVerify(publicKey)
 }
 
 /**
@@ -324,7 +352,7 @@ exports.isValidPublic = function (publicKey, sanitize) {
 exports.pubToAddress = exports.publicToAddress = function (pubKey, sanitize) {
   pubKey = exports.toBuffer(pubKey)
   if (sanitize && (pubKey.length !== 64)) {
-    pubKey = secp256k1.publicKeyConvert(pubKey, false).slice(1)
+    pubKey = publicKeyConvert(pubKey, false).slice(1)
   }
   assert(pubKey.length === 64)
   // Only take the lower 160bits of the hash
@@ -339,7 +367,7 @@ exports.pubToAddress = exports.publicToAddress = function (pubKey, sanitize) {
 const privateToPublic = exports.privateToPublic = function (privateKey) {
   privateKey = exports.toBuffer(privateKey)
   // skip the type flag and use the X, Y points
-  return secp256k1.publicKeyCreate(privateKey, false).slice(1)
+  return publicKeyCreate(privateKey, false).slice(1)
 }
 
 /**
@@ -350,7 +378,7 @@ const privateToPublic = exports.privateToPublic = function (privateKey) {
 exports.importPublic = function (publicKey) {
   publicKey = exports.toBuffer(publicKey)
   if (publicKey.length !== 64) {
-    publicKey = secp256k1.publicKeyConvert(publicKey, false).slice(1)
+    publicKey = publicKeyConvert(publicKey, false).slice(1)
   }
   return publicKey
 }
@@ -362,7 +390,7 @@ exports.importPublic = function (publicKey) {
  * @return {Object}
  */
 exports.ecsign = function (msgHash, privateKey) {
-  const sig = secp256k1.sign(msgHash, privateKey)
+  const sig = sign(msgHash, privateKey)
 
   const ret = {}
   ret.r = sig.signature.slice(0, 32)
@@ -398,8 +426,8 @@ exports.ecrecover = function (msgHash, v, r, s) {
   if (recovery !== 0 && recovery !== 1) {
     throw new Error('Invalid signature v value')
   }
-  const senderPubKey = secp256k1.recover(msgHash, signature, recovery)
-  return secp256k1.publicKeyConvert(senderPubKey, false).slice(1)
+  const senderPubKey = ecdsaRecover(signature, recovery, msgHash)
+  return publicKeyConvert(senderPubKey, false).slice(1)
 }
 
 /**
