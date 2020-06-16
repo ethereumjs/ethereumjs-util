@@ -5,6 +5,8 @@ node_js:
   - "8"
 env:
   - CXX=g++-4.8
+services:
+  - xvfb
 addons:
   firefox: "latest"
   apt:
@@ -12,8 +14,6 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-4.8
-before_install:
-  - sh -e /etc/init.d/xvfb start
 env:
   global:
     - DISPLAY=:99.0
