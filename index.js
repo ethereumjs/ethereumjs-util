@@ -4,7 +4,7 @@ const {
   publicKeyCreate,
   publicKeyVerify,
   publicKeyConvert,
-  sign,
+  sign
 } = require('ethereum-cryptography/shims/hdkey-secp256k1v3')
 const { ecdsaRecover } = require('ethereum-cryptography/secp256k1')
 const secp256k1 = require('ethereum-cryptography/secp256k1')
