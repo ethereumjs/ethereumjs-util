@@ -4,8 +4,8 @@ const {
   publicKeyCreate,
   publicKeyVerify,
   publicKeyConvert,
-  sign
-} = require('ethereum-cryptography/shims/hdkey-secp256k1v3')
+  ecdsaSign
+} = require('ethereum-cryptography/secp256k1')
 const { ecdsaRecover } = require('ethereum-cryptography/secp256k1')
 const secp256k1 = require('ethereum-cryptography/secp256k1')
 const assert = require('assert')
@@ -352,7 +352,7 @@ exports.isValidPublic = function (publicKey, sanitize) {
 exports.pubToAddress = exports.publicToAddress = function (pubKey, sanitize) {
   pubKey = exports.toBuffer(pubKey)
   if (sanitize && (pubKey.length !== 64)) {
-    pubKey = publicKeyConvert(pubKey, false).slice(1)
+    pubKey = Buffer.from(publicKeyConvert(pubKey, false)).slice(1)
   }
   assert(pubKey.length === 64)
   // Only take the lower 160bits of the hash
@@ -367,7 +367,7 @@ exports.pubToAddress = exports.publicToAddress = function (pubKey, sanitize) {
 const privateToPublic = exports.privateToPublic = function (privateKey) {
   privateKey = exports.toBuffer(privateKey)
   // skip the type flag and use the X, Y points
-  return publicKeyCreate(privateKey, false).slice(1)
+  return Buffer.from(publicKeyCreate(privateKey, false)).slice(1)
 }
 
 /**
@@ -378,7 +378,7 @@ const privateToPublic = exports.privateToPublic = function (privateKey) {
 exports.importPublic = function (publicKey) {
   publicKey = exports.toBuffer(publicKey)
   if (publicKey.length !== 64) {
-    publicKey = publicKeyConvert(publicKey, false).slice(1)
+    publicKey = Buffer.from(publicKeyConvert(publicKey, false)).slice(1)
   }
   return publicKey
 }
@@ -390,12 +390,12 @@ exports.importPublic = function (publicKey) {
  * @return {Object}
  */
 exports.ecsign = function (msgHash, privateKey) {
-  const sig = sign(msgHash, privateKey)
+  const sig = ecdsaSign(msgHash, privateKey)
 
   const ret = {}
-  ret.r = sig.signature.slice(0, 32)
-  ret.s = sig.signature.slice(32, 64)
-  ret.v = sig.recovery + 27
+  ret.r = Buffer.from(sig.signature).slice(0, 32)
+  ret.s = Buffer.from(sig.signature).slice(32, 64)
+  ret.v = sig.recid + 27
   return ret
 }
 
@@ -427,7 +427,7 @@ exports.ecrecover = function (msgHash, v, r, s) {
     throw new Error('Invalid signature v value')
   }
   const senderPubKey = ecdsaRecover(signature, recovery, msgHash)
-  return publicKeyConvert(senderPubKey, false).slice(1)
+  return Buffer.from(publicKeyConvert(senderPubKey, false)).slice(1)
 }
 
 /**
