@@ -17,6 +17,7 @@ export { rlp }
 /**
  * [`secp256k1`](https://github.com/cryptocoinjs/secp256k1-node/)
  */
+// TODO: create a wrapper
 export { secp256k1 }
 
 /**
