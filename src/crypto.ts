@@ -30,7 +30,7 @@ export const privateKeyExport = function(privateKey: Buffer, compressed?: boolea
   return Buffer.from(secp256k1.privateKeyExport(privateKey, compressed))
 }
 
-export const privateKeyImport = function (privateKey: Buffer): Buffer {
+export const privateKeyImport = function(privateKey: Buffer): Buffer {
   return Buffer.from(secp256k1.privateKeyImport(privateKey))
 }
 
