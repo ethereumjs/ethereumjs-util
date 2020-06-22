@@ -1,4 +1,4 @@
-const secp256k1 = require('ethereum-cryptography/secp256k1')
+const secp256k1 = require('./crypto')
 const ethjsUtil = require('ethjs-util')
 import BN = require('bn.js')
 import rlp = require('rlp')
@@ -17,7 +17,6 @@ export { rlp }
 /**
  * [`secp256k1`](https://github.com/cryptocoinjs/secp256k1-node/)
  */
-// TODO: create a wrapper
 export { secp256k1 }
 
 /**
