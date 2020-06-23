@@ -166,15 +166,8 @@ export const sign = function(
         data: Uint8Array | null,
         attempt: number,
       ) => {
-        let bufferAlgo: Buffer | null = null
-        if (algo != null) {
-          bufferAlgo = Buffer.from(algo)
-        }
-
-        let bufferData: Buffer | null = null
-        if (data != null) {
-          bufferData = Buffer.from(data)
-        }
+        const bufferAlgo: Buffer | null = algo != null ? Buffer.from(algo) : null
+        const bufferData: Buffer | null = data != null ? Buffer.from(data) : null
 
         let buffer: Buffer = new Buffer('')
 

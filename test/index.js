@@ -646,6 +646,13 @@ describe('isValidSignature', function () {
     const v = 27
     assert.equal(ethUtils.isValidSignature(v, r, s, true), false)
   })
+  it('should fail when s is 0 bytes', function () {
+    const r = Buffer.from('99e71a99cb2270b8cac5254f9e99b6210c6c10224a1579cf389ef88b20a1abe9', 'hex')
+    const s = Buffer.from('0000000000000000000000000000000000000000000000000000000000000000', 'hex')
+
+    const v = 27
+    assert.equal(ethUtils.isValidSignature(v, r, s, true), false)
+  })
   it('should not fail when not on homestead but s > secp256k1n/2', function () {
     const SECP256K1_N_DIV_2 = new BN('7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0', 16)
 
@@ -897,9 +904,20 @@ describe('privateKeyImport', function () {
   })
 
   it('invalid format', function () {
-    assert.throws(function () {
-      const buffer = Buffer.from([0x00])
-      ethUtils.secp256k1.privateKeyImport(buffer)
+    const buffers = [
+      Buffer.from([0x00]),
+      Buffer.from([0x30, 0x7b]),
+      Buffer.from([0x30, 0x87]),
+      Buffer.from([0x30, 0x81]),
+      Buffer.from([0x30, 0x82, 0x00, 0xff]),
+      Buffer.from([0x30, 0x82, 0x00, 0x00]),
+      Buffer.from([0x30, 0x82, 0x00, 0x00, 0x02, 0x01, 0x01])
+    ]
+
+    buffers.forEach((buffer) => {
+      assert.throws(function () {
+        ethUtils.secp256k1.privateKeyImport(buffer)
+      })
     })
   })
 })
@@ -916,6 +934,10 @@ describe('privateKeyExport/privateKeyImport', function () {
       const der2 = ethUtils.secp256k1.privateKeyExport(privateKey, false)
       const privateKey2 = ethUtils.secp256k1.privateKeyImport(der2)
       assert.deepEqual(privateKey2, privateKey)
+
+      const der3 = ethUtils.secp256k1.privateKeyExport(privateKey)
+      const privateKey3 = ethUtils.secp256k1.privateKeyImport(der3)
+      assert.deepEqual(privateKey3, privateKey)
     })
   })
 })
@@ -1669,8 +1691,25 @@ describe('signatureImportLax', function () {
   })
 
   it('parse fail', function () {
-    assert.throws(function () {
-      ethUtils.secp256k1.signatureImportLax(Buffer.alloc(1))
+    const buffers = [
+      Buffer.alloc(0),
+      Buffer.alloc(1),
+      Buffer.from([0x30, 0x7b]),
+      Buffer.from([0x30, 0x87]),
+      Buffer.from([0x30, 0x80, 0x02, 0x80]),
+      Buffer.from([0x30, 0x81, 0x00, 0x02, 0x81]),
+      Buffer.from([0x30, 0x81, 0x00, 0x02, 0x81, 0x01]),
+      Buffer.from([0x30, 0x82, 0x00, 0x00, 0x02, 0x01, 0x01]),
+      Buffer.from([0x30, 0x81, 0x00, 0x02, 0x81, 0x01, 0x00, 0x02, 0x81]),
+      Buffer.from([0x30, 0x81, 0x00, 0x02, 0x81, 0x01, 0x00, 0x02, 0x81, 0x01]),
+      Buffer.from([0x30, 0x81, 0x00, 0x02, 0x21, 0x01, 0x00, 0x02, 0x81, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x02]),
+      Buffer.from([0x30, 0x81, 0x00, 0x02, 0x05, 0x01, 0x00, 0x02, 0x21, 0x02, 0x02, 0x21, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+    ]
+
+    buffers.forEach((buffer) => {
+      assert.throws(function () {
+        ethUtils.secp256k1.signatureImportLax(buffer)
+      })
     })
   })
 

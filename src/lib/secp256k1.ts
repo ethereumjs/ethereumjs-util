@@ -48,9 +48,6 @@ exports.ecdhUnsafe = function(
   compressed: boolean = true,
 ): Buffer {
   const point = ec.keyFromPublic(publicKey)
-  if (point === null) {
-    throw new Error('the public key could not be parsed or is invalid')
-  }
 
   const scalar = new BN(privateKey)
   if (scalar.ucmp(ecparams.n) >= 0 || scalar.isZero()) {
