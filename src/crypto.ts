@@ -5,12 +5,12 @@ const der = require('./lib/der')
 export interface SignOptions {
   data?: Buffer
   noncefn?: (
-    message: Uint8Array,
-    privateKey: Uint8Array,
-    algo: Uint8Array | null,
-    data: Uint8Array | null,
+    message: Buffer,
+    privateKey: Buffer,
+    algo: Buffer | null,
+    data: Buffer | null,
     attempt: number,
-  ) => Uint8Array
+  ) => Buffer
 }
 
 export const privateKeyVerify = function(privateKey: Buffer): boolean {
@@ -133,13 +133,71 @@ export const sign = function(
   privateKey: Buffer,
   options?: SignOptions,
 ): { signature: Buffer; recovery: number } {
-  if (options != null) {
-    if (options.data != null && options.data.length != 32) {
-      throw new RangeError('options.data length is invalid')
+  if (options === null) {
+    throw new TypeError('options should be an Object')
+  }
+
+  let signOptions: secp256k1.SignOptions | undefined = undefined
+
+  if (options) {
+    signOptions = {}
+
+    if (options.data === null) {
+      throw new TypeError('options.data should be a Buffer')
+    }
+
+    if (options.data) {
+      if (options.data.length != 32) {
+        throw new RangeError('options.data length is invalid')
+      }
+
+      signOptions.data = new Uint8Array(options.data)
+    }
+
+    if (options.noncefn === null) {
+      throw new TypeError('options.noncefn should be a Function')
+    }
+
+    if (options.noncefn) {
+      signOptions.noncefn = (
+        message: Uint8Array,
+        privateKey: Uint8Array,
+        algo: Uint8Array | null,
+        data: Uint8Array | null,
+        attempt: number,
+      ) => {
+        let bufferAlgo: Buffer | null = null
+        if (algo != null) {
+          bufferAlgo = Buffer.from(algo)
+        }
+
+        let bufferData: Buffer | null = null
+        if (data != null) {
+          bufferData = Buffer.from(data)
+        }
+
+        let buffer: Buffer = new Buffer('')
+
+        if (options.noncefn) {
+          buffer = options.noncefn(
+            Buffer.from(message),
+            Buffer.from(privateKey),
+            bufferAlgo,
+            bufferData,
+            attempt,
+          )
+        }
+
+        return new Uint8Array(buffer)
+      }
     }
   }
 
-  const sig = secp256k1.ecdsaSign(Uint8Array.from(message), Uint8Array.from(privateKey), options)
+  const sig = secp256k1.ecdsaSign(
+    Uint8Array.from(message),
+    Uint8Array.from(privateKey),
+    signOptions,
+  )
 
   return {
     signature: Buffer.from(sig.signature),

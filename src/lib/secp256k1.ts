@@ -25,7 +25,7 @@ exports.privateKeyModInverse = function(privateKey: Buffer): Buffer {
     throw new Error('private key range is invalid')
   }
 
-  return bn.invm(ecparams.n).toBuffer()
+  return bn.invm(ecparams.n).toArrayLike(Buffer, 'be', 32)
 }
 
 exports.signatureImport = function(sigObj: SigObj): Buffer {
@@ -39,7 +39,7 @@ exports.signatureImport = function(sigObj: SigObj): Buffer {
     s = new BN(0)
   }
 
-  return Buffer.concat([r.toBuffer(), s.toBuffer()])
+  return Buffer.concat([r.toArrayLike(Buffer, 'be', 32), s.toArrayLike(Buffer, 'be', 32)])
 }
 
 exports.ecdhUnsafe = function(
@@ -67,12 +67,12 @@ const toPublicKey = function(x: BN, y: BN, compressed: boolean): Buffer {
   if (compressed) {
     publicKey = Buffer.alloc(33)
     publicKey[0] = y.isOdd() ? 0x03 : 0x02
-    x.toBuffer().copy(publicKey, 1)
+    x.toArrayLike(Buffer, 'be', 32).copy(publicKey, 1)
   } else {
     publicKey = Buffer.alloc(65)
     publicKey[0] = 0x04
-    x.toBuffer().copy(publicKey, 1)
-    y.toBuffer().copy(publicKey, 33)
+    x.toArrayLike(Buffer, 'be', 32).copy(publicKey, 1)
+    y.toArrayLike(Buffer, 'be', 32).copy(publicKey, 33)
   }
 
   return publicKey

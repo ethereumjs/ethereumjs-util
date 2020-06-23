@@ -1941,7 +1941,7 @@ describe('sign', function () {
     const data = getRandomBytes(32)
     const noncefn = function (message2, privateKey2, algo, data2, attempt) {
       assert.deepEqual(message2, message)
-      assert.deepEqual(privateKey, privateKey)
+      assert.deepEqual(privateKey2, privateKey)
       assert.deepEqual(algo, null)
       assert.deepEqual(data2, data)
       assert.deepEqual(attempt, 0)
