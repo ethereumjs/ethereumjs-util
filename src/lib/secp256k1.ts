@@ -42,6 +42,25 @@ exports.signatureImport = function(sigObj: SigObj): Buffer {
   return Buffer.concat([r.toBuffer(), s.toBuffer()])
 }
 
+exports.ecdhUnsafe = function(
+  publicKey: Buffer,
+  privateKey: Buffer,
+  compressed: boolean = true,
+): Buffer {
+  const point = ec.keyFromPublic(publicKey)
+  if (point === null) {
+    throw new Error('the public key could not be parsed or is invalid')
+  }
+
+  const scalar = new BN(privateKey)
+  if (scalar.ucmp(ecparams.n) >= 0 || scalar.isZero()) {
+    throw new Error('scalar was invalid (zero or overflow)')
+  }
+
+  const shared = point.pub.mul(scalar)
+  return toPublicKey(shared.getX(), shared.getY(), compressed)
+}
+
 const toPublicKey = function(x: BN, y: BN, compressed: boolean): Buffer {
   let publicKey
 

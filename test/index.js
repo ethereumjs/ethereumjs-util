@@ -911,7 +911,7 @@ describe('privateKeyExport/privateKeyImport', function () {
     privateKeys.forEach((privateKey) => {
       const der1 = ethUtils.secp256k1.privateKeyExport(privateKey, true)
       const privateKey1 = ethUtils.secp256k1.privateKeyImport(der1)
-      assert.deepEqual(privateKey1[0], privateKey[0])
+      assert.deepEqual(privateKey1, privateKey)
 
       const der2 = ethUtils.secp256k1.privateKeyExport(privateKey, false)
       const privateKey2 = ethUtils.secp256k1.privateKeyImport(der2)

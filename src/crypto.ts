@@ -1,4 +1,4 @@
-import * as secp256k1 from 'secp256k1'
+import * as secp256k1 from 'ethereum-cryptography/secp256k1'
 const wrapper = require('./lib/secp256k1')
 const der = require('./lib/der')
 
@@ -166,11 +166,20 @@ export const ecdh = function(publicKey: Buffer, privateKey: Buffer): Buffer {
   return Buffer.from(secp256k1.ecdh(Uint8Array.from(publicKey), Uint8Array.from(privateKey), {}))
 }
 
-//TODO use compressed
 export const ecdhUnsafe = function(
   publicKey: Buffer,
   privateKey: Buffer,
   compressed?: boolean,
 ): Buffer {
-  return Buffer.from(secp256k1.ecdh(Uint8Array.from(publicKey), Uint8Array.from(privateKey)))
+  if (publicKey.length !== 33 && publicKey.length !== 65) {
+    throw new RangeError('public key length is invalid')
+  }
+
+  if (privateKey.length !== 32) {
+    throw new RangeError('private key length is invalid')
+  }
+
+  return Buffer.from(
+    wrapper.ecdhUnsafe(Uint8Array.from(publicKey), Uint8Array.from(privateKey), compressed),
+  )
 }
