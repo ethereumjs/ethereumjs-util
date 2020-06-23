@@ -1,10 +1,6 @@
-//TODO: tests
 import * as secp256k1 from 'secp256k1'
-import BN = require('bn.js')
-
-const n = new BN(
-  Buffer.from('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141', 'hex'),
-)
+const wrapper = require('./lib/secp256k1')
+const der = require('./lib/der')
 
 export interface SignOptions {
   data?: Buffer
@@ -17,49 +13,65 @@ export interface SignOptions {
   ) => Uint8Array
 }
 
-interface SigObj {
-  r: Buffer
-  s: Buffer
-}
-
 export const privateKeyVerify = function(privateKey: Buffer): boolean {
-  return secp256k1.privateKeyVerify(privateKey)
+  return secp256k1.privateKeyVerify(Uint8Array.from(privateKey))
 }
 
 export const privateKeyExport = function(privateKey: Buffer, compressed?: boolean): Buffer {
-  return Buffer.from(secp256k1.privateKeyExport(privateKey, compressed))
+  if (privateKey.length !== 32) {
+    throw new RangeError('private key length is invalid')
+  }
+
+  const publicKey = wrapper.privateKeyExport(privateKey, compressed)
+
+  return der.privateKeyExport(privateKey, publicKey, compressed)
 }
 
 export const privateKeyImport = function(privateKey: Buffer): Buffer {
-  return Buffer.from(secp256k1.privateKeyImport(privateKey))
+  privateKey = der.privateKeyImport(privateKey)
+  if (privateKey !== null && privateKey.length === 32 && privateKeyVerify(privateKey)) {
+    return privateKey
+  }
+
+  throw new Error("couldn't import from DER format")
 }
 
 export const privateKeyNegate = function(privateKey: Buffer): Buffer {
-  return Buffer.from(secp256k1.privateKeyNegate(privateKey))
+  return Buffer.from(secp256k1.privateKeyNegate(Uint8Array.from(privateKey)))
 }
 
 export const privateKeyModInverse = function(privateKey: Buffer): Buffer {
-  return Buffer.from(secp256k1.privateKeyModInverse(privateKey))
+  if (privateKey.length !== 32) {
+    throw new Error('private key length is invalid')
+  }
+
+  return Buffer.from(wrapper.privateKeyModInverse(Uint8Array.from(privateKey)))
 }
 
 export const privateKeyTweakAdd = function(privateKey: Buffer, tweak: Buffer): Buffer {
-  return Buffer.from(secp256k1.privateKeyTweakAdd(privateKey, tweak))
+  return Buffer.from(secp256k1.privateKeyTweakAdd(Uint8Array.from(privateKey), tweak))
 }
 
 export const privateKeyTweakMul = function(privateKey: Buffer, tweak: Buffer): Buffer {
-  return Buffer.from(secp256k1.privateKeyTweakMul(privateKey, tweak))
+  return Buffer.from(
+    secp256k1.privateKeyTweakMul(Uint8Array.from(privateKey), Uint8Array.from(tweak)),
+  )
 }
 
 export const publicKeyCreate = function(privateKey: Buffer, compressed?: boolean): Buffer {
-  return Buffer.from(secp256k1.publicKeyCreate(privateKey, compressed))
+  return Buffer.from(secp256k1.publicKeyCreate(Uint8Array.from(privateKey), compressed))
 }
 
 export const publicKeyConvert = function(publicKey: Buffer, compressed?: boolean): Buffer {
-  return Buffer.from(secp256k1.publicKeyConvert(publicKey, compressed))
+  return Buffer.from(secp256k1.publicKeyConvert(Uint8Array.from(publicKey), compressed))
 }
 
 export const publicKeyVerify = function(publicKey: Buffer): boolean {
-  return secp256k1.publicKeyVerify(publicKey)
+  if (publicKey.length !== 33 && publicKey.length !== 65) {
+    return false
+  }
+
+  return secp256k1.publicKeyVerify(Uint8Array.from(publicKey))
 }
 
 export const publicKeyTweakAdd = function(
@@ -67,7 +79,9 @@ export const publicKeyTweakAdd = function(
   tweak: Buffer,
   compressed?: boolean,
 ): Buffer {
-  return Buffer.from(secp256k1.publicKeyTweakAdd(publicKey, tweak, compressed))
+  return Buffer.from(
+    secp256k1.publicKeyTweakAdd(Uint8Array.from(publicKey), Uint8Array.from(tweak), compressed),
+  )
 }
 
 export const publicKeyTweakMul = function(
@@ -75,23 +89,30 @@ export const publicKeyTweakMul = function(
   tweak: Buffer,
   compressed?: boolean,
 ): Buffer {
-  return Buffer.from(secp256k1.publicKeyTweakMul(publicKey, tweak, compressed))
+  return Buffer.from(
+    secp256k1.publicKeyTweakMul(Uint8Array.from(publicKey), Uint8Array.from(tweak), compressed),
+  )
 }
 
 export const publicKeyCombine = function(publicKeys: Buffer[], compressed?: boolean): Buffer {
-  return Buffer.from(secp256k1.publicKeyCombine(publicKeys, compressed))
+  const keys: Uint8Array[] = []
+  publicKeys.forEach((publicKey: Buffer) => {
+    keys.push(Uint8Array.from(publicKey))
+  })
+
+  return Buffer.from(secp256k1.publicKeyCombine(keys, compressed))
 }
 
 export const signatureNormalize = function(signature: Buffer): Buffer {
-  return Buffer.from(secp256k1.signatureNormalize(signature))
+  return Buffer.from(secp256k1.signatureNormalize(Uint8Array.from(signature)))
 }
 
 export const signatureExport = function(signature: Buffer): Buffer {
-  return Buffer.from(secp256k1.signatureExport(signature))
+  return Buffer.from(secp256k1.signatureExport(Uint8Array.from(signature)))
 }
 
 export const signatureImport = function(signature: Buffer): Buffer {
-  return Buffer.from(secp256k1.signatureImport(signature))
+  return Buffer.from(secp256k1.signatureImport(Uint8Array.from(signature)))
 }
 
 export const signatureImportLax = function(signature: Buffer): Buffer {
@@ -99,22 +120,12 @@ export const signatureImportLax = function(signature: Buffer): Buffer {
     throw new RangeError('signature length is invalid')
   }
 
-  const sigObj = importLax(signature)
+  const sigObj = der.signatureImportLax(signature)
   if (sigObj === null) {
     throw new Error("couldn't parse DER signature")
   }
 
-  let r = new BN(sigObj.r)
-  if (r.ucmp(n)) {
-    r = new BN(0)
-  }
-
-  let s = new BN(sigObj.s)
-  if (s.ucmp(n)) {
-    s = new BN(0)
-  }
-
-  return Buffer.concat([r.toBuffer(), s.toBuffer()])
+  return wrapper.signatureImport(sigObj)
 }
 
 export const sign = function(
@@ -122,7 +133,13 @@ export const sign = function(
   privateKey: Buffer,
   options?: SignOptions,
 ): { signature: Buffer; recovery: number } {
-  const sig = secp256k1.ecdsaSign(message, privateKey, options)
+  if (options != null) {
+    if (options.data != null && options.data.length != 32) {
+      throw new RangeError('options.data length is invalid')
+    }
+  }
+
+  const sig = secp256k1.ecdsaSign(Uint8Array.from(message), Uint8Array.from(privateKey), options)
 
   return {
     signature: Buffer.from(sig.signature),
@@ -131,20 +148,22 @@ export const sign = function(
 }
 
 export const verify = function(message: Buffer, signature: Buffer, publicKey: Buffer): boolean {
-  return secp256k1.ecdsaVerify(signature, message, publicKey)
+  return secp256k1.ecdsaVerify(Uint8Array.from(signature), Uint8Array.from(message), publicKey)
 }
 
 export const recover = function(
+  message: Buffer,
   signature: Buffer,
   recid: number,
-  message: Buffer,
   compressed?: boolean,
 ): Buffer {
-  return Buffer.from(secp256k1.ecdsaRecover(signature, recid, message, compressed))
+  return Buffer.from(
+    secp256k1.ecdsaRecover(Uint8Array.from(signature), recid, Uint8Array.from(message), compressed),
+  )
 }
 
 export const ecdh = function(publicKey: Buffer, privateKey: Buffer): Buffer {
-  return Buffer.from(secp256k1.ecdh(publicKey, privateKey, {}))
+  return Buffer.from(secp256k1.ecdh(Uint8Array.from(publicKey), Uint8Array.from(privateKey), {}))
 }
 
 //TODO use compressed
@@ -153,96 +172,5 @@ export const ecdhUnsafe = function(
   privateKey: Buffer,
   compressed?: boolean,
 ): Buffer {
-  const fn = function(x: Uint8Array, y: Uint8Array) {
-    const pubKey = new Uint8Array(33)
-    pubKey[0] = (y[31] & 1) === 0 ? 0x02 : 0x03
-    pubKey.set(x, 1)
-    return pubKey
-  }
-
-  return Buffer.from(secp256k1.ecdh(publicKey, privateKey, { hashfn: fn }))
-}
-
-const importLax = function(signature: Buffer): SigObj | null {
-  const r = Buffer.alloc(32, 0)
-  const s = Buffer.alloc(32, 0)
-
-  const length = signature.length
-  let index = 0
-
-  // sequence tag byte
-  if (signature[index++] !== 0x30) {
-    return null
-  }
-
-  // sequence length byte
-  let lenbyte = signature[index++]
-  if (lenbyte & 0x80) {
-    index += lenbyte - 0x80
-    if (index > length) {
-      return null
-    }
-  }
-
-  // sequence tag byte for r
-  if (signature[index++] !== 0x02) {
-    return null
-  }
-
-  // length for r
-  let rlen = signature[index++]
-  if (rlen & 0x80) {
-    lenbyte = rlen - 0x80
-    if (index + lenbyte > length) {
-      return null
-    }
-    for (; lenbyte > 0 && signature[index] === 0x00; index += 1, lenbyte -= 1);
-    for (rlen = 0; lenbyte > 0; index += 1, lenbyte -= 1) rlen = (rlen << 8) + signature[index]
-  }
-  if (rlen > length - index) {
-    return null
-  }
-  let rindex = index
-  index += rlen
-
-  // sequence tag byte for s
-  if (signature[index++] !== 0x02) {
-    return null
-  }
-
-  // length for s
-  let slen = signature[index++]
-  if (slen & 0x80) {
-    lenbyte = slen - 0x80
-    if (index + lenbyte > length) {
-      return null
-    }
-    for (; lenbyte > 0 && signature[index] === 0x00; index += 1, lenbyte -= 1);
-    for (slen = 0; lenbyte > 0; index += 1, lenbyte -= 1) slen = (slen << 8) + signature[index]
-  }
-  if (slen > length - index) {
-    return null
-  }
-  let sindex = index
-  index += slen
-
-  // ignore leading zeros in r
-  for (; rlen > 0 && signature[rindex] === 0x00; rlen -= 1, rindex += 1);
-  // copy r value
-  if (rlen > 32) {
-    return null
-  }
-  const rvalue = signature.slice(rindex, rindex + rlen)
-  rvalue.copy(r, 32 - rvalue.length)
-
-  // ignore leading zeros in s
-  for (; slen > 0 && signature[sindex] === 0x00; slen -= 1, sindex += 1);
-  // copy s value
-  if (slen > 32) {
-    return null
-  }
-  const svalue = signature.slice(sindex, sindex + slen)
-  svalue.copy(s, 32 - svalue.length)
-
-  return { r: r, s: s }
+  return Buffer.from(secp256k1.ecdh(Uint8Array.from(publicKey), Uint8Array.from(privateKey)))
 }
