@@ -3,87 +3,74 @@ const EC = require('elliptic').ec
 const ec = new EC('secp256k1')
 const getRandomBytes = require('crypto').randomBytes
 
-function getPrivateKeys(count) {
-    const privateKeys = []
-    for (let i = 0; i < count; i++) {
-        privateKeys.push(getRandomBytes(32))
-    }
+const getPrivateKeys = function (count) {
+  const privateKeys = []
+  for (let i = 0; i < count; i++) {
+    privateKeys.push(getRandomBytes(32))
+  }
 
-    return privateKeys
+  return privateKeys
 }
 
-function getPrivateKey() {
-    return getRandomBytes(32)
+const getPrivateKey = function () {
+  return getRandomBytes(32)
 }
 
-function getTweak() {
-    return getRandomBytes(32)
+const getTweak = function () {
+  return getRandomBytes(32)
 }
 
-function getMessage () {
-    return getRandomBytes(32)
+const getMessage = function () {
+  return getRandomBytes(32)
 }
 
 function getSignature (message, privateKey) {
-    return sign(message, privateKey).signatureLowS
+  return sign(message, privateKey).signatureLowS
 }
 
-function getPublicKeys(privateKeys) {
-    const publicKeys = []
-    privateKeys.forEach((privateKey) => {
-        const publicKey = ec.keyFromPrivate(privateKey).getPublic()
-        publicKeys.push({
-            compressed: Buffer.from(publicKey.encode(null, true)),
-            uncompressed: Buffer.from(publicKey.encode(null, false))
-        })
-    })
-
-    return publicKeys
+const getPublicKey = function (privateKey) {
+  const publicKey = ec.keyFromPrivate(privateKey).getPublic()
+  return {
+    compressed: Buffer.from(publicKey.encode(null, true)),
+    uncompressed: Buffer.from(publicKey.encode(null, false))
+  }
 }
 
-function getPublicKey(privateKey) {
-    const publicKey = ec.keyFromPrivate(privateKey).getPublic()
-    return {
-        compressed: Buffer.from(publicKey.encode(null, true)),
-        uncompressed: Buffer.from(publicKey.encode(null, false))
-    }
-}
+const sign = function (message, privateKey) {
+  const ecSig = ec.sign(message, privateKey, {canonical: false})
 
-function sign (message, privateKey) {
-    const ecSig = ec.sign(message, privateKey, { canonical: false })
+  const signature = Buffer.concat([
+    ecSig.r.toArrayLike(Buffer, 'be', 32),
+    ecSig.s.toArrayLike(Buffer, 'be', 32)
+  ])
+  let recovery = ecSig.recoveryParam
+  if (ecSig.s.cmp(ec.nh) === 1) {
+    ecSig.s = ec.n.sub(ecSig.s)
+    recovery ^= 1
+  }
+  const signatureLowS = Buffer.concat([
+    ecSig.r.toArrayLike(Buffer, 'be', 32),
+    ecSig.s.toArrayLike(Buffer, 'be', 32)
+  ])
 
-    const signature = Buffer.concat([
-        ecSig.r.toArrayLike(Buffer, 'be', 32),
-        ecSig.s.toArrayLike(Buffer, 'be', 32)
-    ])
-    let recovery = ecSig.recoveryParam
-    if (ecSig.s.cmp(ec.nh) === 1) {
-        ecSig.s = ec.n.sub(ecSig.s)
-        recovery ^= 1
-    }
-    const signatureLowS = Buffer.concat([
-        ecSig.r.toArrayLike(Buffer, 'be', 32),
-        ecSig.s.toArrayLike(Buffer, 'be', 32)
-    ])
-
-    return {
-        signature: signature,
-        signatureLowS: signatureLowS,
-        recovery: recovery
-    }
+  return {
+    signature: signature,
+    signatureLowS: signatureLowS,
+    recovery: recovery
+  }
 }
 
 module.exports = {
-    ec: ec,
-    BN_ZERO: new BN(0),
-    BN_ONE: new BN(1),
+  ec: ec,
+  BN_ZERO: new BN(0),
+  BN_ONE: new BN(1),
 
-    getPrivateKeys: getPrivateKeys,
-    getPrivateKey: getPrivateKey,
-    getPublicKey: getPublicKey,
-    getTweak: getTweak,
-    getMessage: getMessage,
-    getSignature: getSignature,
+  getPrivateKeys: getPrivateKeys,
+  getPrivateKey: getPrivateKey,
+  getPublicKey: getPublicKey,
+  getTweak: getTweak,
+  getMessage: getMessage,
+  getSignature: getSignature,
 
-    sign: sign,
+  sign: sign
 }

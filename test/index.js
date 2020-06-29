@@ -47,14 +47,14 @@ describe('keccak', function () {
   it('should produce a keccak384 hash', function () {
     const msg = '0x3c9229289a6125f7fdf1885a77bb12c37a8d3b4962d936f7e3084dece32a3ca1'
     const r =
-        '923e0f6a1c324a698139c3f3abbe88ac70bf2e7c02b26192c6124732555a32cef18e81ac91d5d97ce969745409c5bbc6'
+      '923e0f6a1c324a698139c3f3abbe88ac70bf2e7c02b26192c6124732555a32cef18e81ac91d5d97ce969745409c5bbc6'
     const hash = ethUtils.keccak(msg, 384)
     assert.equal(hash.toString('hex'), r)
   })
   it('should produce a keccak512 hash', function () {
     const msg = '0x3c9229289a6125f7fdf1885a77bb12c37a8d3b4962d936f7e3084dece32a3ca1'
     const r =
-        '36fdacd0339307068e9ed191773a6f11f6f9f99016bd50f87fd529ab7c87e1385f2b7ef1ac257cc78a12dcb3e5804254c6a7b404a6484966b831eadc721c3d24'
+      '36fdacd0339307068e9ed191773a6f11f6f9f99016bd50f87fd529ab7c87e1385f2b7ef1ac257cc78a12dcb3e5804254c6a7b404a6484966b831eadc721c3d24'
     const hash = ethUtils.keccak(msg, 512)
     assert.equal(hash.toString('hex'), r)
   })
@@ -482,11 +482,15 @@ describe('toBuffer', function () {
     // 'toBN'
     assert.deepEqual(ethUtils.toBuffer(new BN(1)), Buffer.from([1]))
     // 'toArray'
-    assert.deepEqual(ethUtils.toBuffer({ toArray: function () { return [ 1 ] } }), Buffer.from([1]))
+    assert.deepEqual(ethUtils.toBuffer({
+      toArray: function () {
+        return [1]
+      }
+    }), Buffer.from([1]))
   })
   it('should fail', function () {
     assert.throws(function () {
-      ethUtils.toBuffer({ test: 1 })
+      ethUtils.toBuffer({test: 1})
     })
   })
 })
@@ -685,7 +689,6 @@ describe('privateKeyVerify', function () {
     assert.equal(ethUtils.secp256k1.privateKeyVerify(privateKey), false)
   })
 
-
   it('equal to N', function () {
     const privateKey = util.ec.curve.n.toArrayLike(Buffer, 'be', 32)
     assert.equal(ethUtils.secp256k1.privateKeyVerify(privateKey), false)
@@ -747,7 +750,7 @@ describe('privateKeyImport', function () {
 })
 
 describe('privateKeyExport/privateKeyImport', function () {
-  it('export/import', function() {
+  it('export/import', function () {
     const privateKeys = util.getPrivateKeys(10)
 
     privateKeys.forEach((privateKey) => {
@@ -1093,7 +1096,7 @@ describe('publicKeyVerify', function () {
 
   it('x overflow (first byte is 0x03)', function () {
     const publicKey = Buffer.concat([
-      Buffer.from([ 0x03 ]),
+      Buffer.from([0x03]),
       util.ec.curve.p.toArrayLike(Buffer, 'be', 32)
     ])
     assert.equal(ethUtils.secp256k1.publicKeyVerify(publicKey), false)
@@ -1101,7 +1104,7 @@ describe('publicKeyVerify', function () {
 
   it('x overflow', function () {
     const publicKey = Buffer.concat([
-      Buffer.from([ 0x04 ]),
+      Buffer.from([0x04]),
       util.ec.curve.p.toArrayLike(Buffer, 'be', 32)
     ])
     assert.equal(ethUtils.secp256k1.publicKeyVerify(publicKey), false)
@@ -1109,7 +1112,7 @@ describe('publicKeyVerify', function () {
 
   it('y overflow', function () {
     const publicKey = Buffer.concat([
-      Buffer.from([ 0x04 ]),
+      Buffer.from([0x04]),
       Buffer.alloc(32),
       util.ec.curve.p.toArrayLike(Buffer, 'be', 32)
     ])
@@ -1118,7 +1121,7 @@ describe('publicKeyVerify', function () {
 
   it('y is even, first byte is 0x07', function () {
     const publicKey = Buffer.concat([
-      Buffer.from([ 0x07 ]),
+      Buffer.from([0x07]),
       Buffer.alloc(32),
       util.ec.curve.p.subn(1).toArrayLike(Buffer, 'be', 32)
     ])
@@ -1310,7 +1313,6 @@ describe('publicKeyTweakMul', function () {
       const tweak = util.getTweak()
       const publicPoint = util.ec.g.mul(new BN(privateKey))
       const publicKey = Buffer.from(publicPoint.encode(null, true))
-      const expected = util.ec.g.mul(new BN(tweak)).add(publicPoint)
 
       if (new BN(tweak).cmp(util.BN_ZERO) === 0) {
         assert.throws(function () {
@@ -1482,7 +1484,6 @@ describe('signatureExport', function () {
       ethUtils.secp256k1.signatureExport(signature)
     })
   })
-
 })
 
 describe('signatureImport', function () {
@@ -1504,7 +1505,6 @@ describe('signatureImport', function () {
       ethUtils.secp256k1.signatureImport(signature)
     })
   })
-
 })
 
 describe('signatureImportLax', function () {
@@ -1634,7 +1634,6 @@ describe('ecdh', function () {
   })
 })
 
-
 describe('ecdhUnsafeUnsafe', function () {
   it('public key should be a Buffer', function () {
     assert.throws(function () {
@@ -1759,7 +1758,7 @@ describe('sign', function () {
     assert.throws(function () {
       const message = util.getMessage()
       const privateKey = util.getPrivateKey()
-      ethUtils.secp256k1.sign(message, privateKey, { data: null })
+      ethUtils.secp256k1.sign(message, privateKey, {data: null})
     })
   })
 
@@ -1768,7 +1767,7 @@ describe('sign', function () {
       const message = util.getMessage()
       const privateKey = util.getPrivateKey()
       const data = getRandomBytes(31)
-      ethUtils.secp256k1.sign(message, privateKey, { data: data })
+      ethUtils.secp256k1.sign(message, privateKey, {data: data})
     })
   })
 
@@ -1776,7 +1775,7 @@ describe('sign', function () {
     assert.throws(function () {
       const message = util.getMessage()
       const privateKey = util.getPrivateKey()
-      ethUtils.secp256k1.sign(message, privateKey, { noncefn: null })
+      ethUtils.secp256k1.sign(message, privateKey, {noncefn: null})
     })
   })
 
@@ -1784,8 +1783,10 @@ describe('sign', function () {
     assert.throws(function () {
       const message = util.getMessage()
       const privateKey = util.getPrivateKey()
-      const noncefn = function () { return null }
-      ethUtils.secp256k1.sign(message, privateKey, { noncefn: noncefn })
+      const noncefn = function () {
+        return null
+      }
+      ethUtils.secp256k1.sign(message, privateKey, {noncefn: noncefn})
     })
   })
 
@@ -1793,8 +1794,10 @@ describe('sign', function () {
     assert.throws(function () {
       const message = util.getMessage()
       const privateKey = util.getPrivateKey()
-      const noncefn = function () { return getRandomBytes(31) }
-      ethUtils.secp256k1.sign(message, privateKey, { noncefn: noncefn })
+      const noncefn = function () {
+        return getRandomBytes(31)
+      }
+      ethUtils.secp256k1.sign(message, privateKey, {noncefn: noncefn})
     })
   })
 
@@ -1810,9 +1813,8 @@ describe('sign', function () {
       assert.deepEqual(attempt, 0)
       return getRandomBytes(32)
     }
-    ethUtils.secp256k1.sign(message, privateKey, { data: data, noncefn: noncefn })
+    ethUtils.secp256k1.sign(message, privateKey, {data: data, noncefn: noncefn})
   })
-
 })
 
 describe('verify', function () {
@@ -1897,7 +1899,6 @@ describe('verify', function () {
       ethUtils.secp256k1.verify(message, signature, publicKey)
     })
   })
-
 })
 
 describe('recover', function () {
@@ -1996,4 +1997,3 @@ describe('recover', function () {
     })
   })
 })
-
