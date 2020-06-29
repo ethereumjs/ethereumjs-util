@@ -14,7 +14,7 @@
     "test": "npm run test:node && npm run test:browser",
     "test:browser": "npm run build:dist && karma start karma.conf.js",
     "test:node": "npm run build:dist && istanbul test mocha -- --reporter spec",
-    "build:dist": "babel index.js --source-root ./ -d ./dist",
+    "build:dist": "babel index.js crypto.js lib/* --source-root ./ -d ./dist",
     "build:docs": "documentation build ./index.js --github --sort-order='alpha' -f md > ./docs/index.md"
   },
   "repository": {
