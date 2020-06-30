@@ -128,11 +128,11 @@ export const isPrecompiled = function(address: Buffer | string): boolean {
  * Checks if the private key satisfies the rules of the curve secp256k1.
  */
 export const isValidPrivate = function(privateKey: Buffer): boolean {
-  try {
-    return privateKeyVerify(privateKey)
-  } catch (e) {
+  if (privateKey.length !== 32) {
     return false
   }
+
+  return privateKeyVerify(privateKey)
 }
 
 /**

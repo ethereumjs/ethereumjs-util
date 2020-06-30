@@ -169,7 +169,7 @@ export const sign = function(
         const bufferAlgo: Buffer | null = algo != null ? Buffer.from(algo) : null
         const bufferData: Buffer | null = data != null ? Buffer.from(data) : null
 
-        let buffer: Buffer = new Buffer('')
+        let buffer: Buffer = Buffer.from('')
 
         if (options.noncefn) {
           buffer = options.noncefn(
