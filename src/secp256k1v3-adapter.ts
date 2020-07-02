@@ -1,5 +1,5 @@
 import * as secp256k1 from 'ethereum-cryptography/secp256k1'
-const wrapper = require('./secp256k1v3-lib/index')
+const secp256k1v3 = require('./secp256k1v3-lib/index')
 const der = require('./secp256k1v3-lib/der')
 
 export interface SignOptions {
@@ -14,6 +14,10 @@ export interface SignOptions {
 }
 
 export const privateKeyVerify = function(privateKey: Buffer): boolean {
+  if (privateKey.length !== 32) {
+    return false
+  }
+
   return secp256k1.privateKeyVerify(Uint8Array.from(privateKey))
 }
 
@@ -22,7 +26,7 @@ export const privateKeyExport = function(privateKey: Buffer, compressed?: boolea
     throw new RangeError('private key length is invalid')
   }
 
-  const publicKey = wrapper.privateKeyExport(privateKey, compressed)
+  const publicKey = secp256k1v3.privateKeyExport(privateKey, compressed)
 
   return der.privateKeyExport(privateKey, publicKey, compressed)
 }
@@ -45,7 +49,7 @@ export const privateKeyModInverse = function(privateKey: Buffer): Buffer {
     throw new Error('private key length is invalid')
   }
 
-  return Buffer.from(wrapper.privateKeyModInverse(Uint8Array.from(privateKey)))
+  return Buffer.from(secp256k1v3.privateKeyModInverse(Uint8Array.from(privateKey)))
 }
 
 export const privateKeyTweakAdd = function(privateKey: Buffer, tweak: Buffer): Buffer {
@@ -125,7 +129,7 @@ export const signatureImportLax = function(signature: Buffer): Buffer {
     throw new Error("couldn't parse DER signature")
   }
 
-  return wrapper.signatureImport(sigObj)
+  return secp256k1v3.signatureImport(sigObj)
 }
 
 export const sign = function(
@@ -231,6 +235,6 @@ export const ecdhUnsafe = function(
   }
 
   return Buffer.from(
-    wrapper.ecdhUnsafe(Uint8Array.from(publicKey), Uint8Array.from(privateKey), compressed),
+    secp256k1v3.ecdhUnsafe(Uint8Array.from(publicKey), Uint8Array.from(privateKey), compressed),
   )
 }

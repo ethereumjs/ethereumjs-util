@@ -1,11 +1,6 @@
 const assert = require('assert')
-const {
-  privateKeyVerify,
-  publicKeyCreate,
-  publicKeyVerify,
-  publicKeyConvert,
-} = require('ethereum-cryptography/secp256k1')
 const ethjsUtil = require('ethjs-util')
+const secp256k1 = require('./secp256k1v3-adapter')
 import BN = require('bn.js')
 import { toBuffer, addHexPrefix, zeros, bufferToHex, unpad } from './bytes'
 import { keccak, keccak256, rlphash } from './hash'
@@ -128,11 +123,7 @@ export const isPrecompiled = function(address: Buffer | string): boolean {
  * Checks if the private key satisfies the rules of the curve secp256k1.
  */
 export const isValidPrivate = function(privateKey: Buffer): boolean {
-  if (privateKey.length !== 32) {
-    return false
-  }
-
-  return privateKeyVerify(privateKey)
+  return secp256k1.privateKeyVerify(privateKey)
 }
 
 /**
@@ -144,14 +135,14 @@ export const isValidPrivate = function(privateKey: Buffer): boolean {
 export const isValidPublic = function(publicKey: Buffer, sanitize: boolean = false): boolean {
   if (publicKey.length === 64) {
     // Convert to SEC1 for secp256k1
-    return publicKeyVerify(Buffer.concat([Buffer.from([4]), publicKey]))
+    return secp256k1.publicKeyVerify(Buffer.concat([Buffer.from([4]), publicKey]))
   }
 
   if (!sanitize) {
     return false
   }
 
-  return publicKeyVerify(publicKey)
+  return secp256k1.publicKeyVerify(publicKey)
 }
 
 /**
@@ -163,7 +154,7 @@ export const isValidPublic = function(publicKey: Buffer, sanitize: boolean = fal
 export const pubToAddress = function(pubKey: Buffer, sanitize: boolean = false): Buffer {
   pubKey = toBuffer(pubKey)
   if (sanitize && pubKey.length !== 64) {
-    pubKey = Buffer.from(publicKeyConvert(pubKey, false)).slice(1)
+    pubKey = secp256k1.publicKeyConvert(pubKey, false).slice(1)
   }
   assert(pubKey.length === 64)
   // Only take the lower 160bits of the hash
@@ -186,7 +177,7 @@ export const privateToAddress = function(privateKey: Buffer): Buffer {
 export const privateToPublic = function(privateKey: Buffer): Buffer {
   privateKey = toBuffer(privateKey)
   // skip the type flag and use the X, Y points
-  return Buffer.from(publicKeyCreate(privateKey, false)).slice(1)
+  return secp256k1.publicKeyCreate(privateKey, false).slice(1)
 }
 
 /**
@@ -195,7 +186,7 @@ export const privateToPublic = function(privateKey: Buffer): Buffer {
 export const importPublic = function(publicKey: Buffer): Buffer {
   publicKey = toBuffer(publicKey)
   if (publicKey.length !== 64) {
-    publicKey = Buffer.from(publicKeyConvert(publicKey, false)).slice(1)
+    publicKey = secp256k1.publicKeyConvert(publicKey, false).slice(1)
   }
   return publicKey
 }
