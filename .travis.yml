@@ -23,9 +23,9 @@ matrix:
   fast_finish: true
   include:
     - os: linux
-      node_js: "4"
+      node_js: "8"
       env: CXX=g++-4.8 TEST_SUITE=coveralls
     - os: linux
-      node_js: "4"
+      node_js: "8"
       env: CXX=g++-4.8 TEST_SUITE=lint
 script: npm run $TEST_SUITE
