@@ -4,6 +4,10 @@ const secp256k1v3 = require('./secp256k1-lib/index')
 const der = require('./secp256k1-lib/der')
 
 const privateKeyVerify = function (privateKey) {
+  if (privateKey.length !== 32) {
+    return false
+  }
+
   return secp256k1.privateKeyVerify(Uint8Array.from(privateKey))
 }
 

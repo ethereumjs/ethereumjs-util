@@ -679,9 +679,7 @@ describe('privateKeyVerify', function () {
   })
 
   it('invalid length', function () {
-    assert.throws(function () {
-      ethUtils.secp256k1.privateKeyVerify(util.getPrivateKey().slice(1))
-    })
+    assert.equal(ethUtils.secp256k1.privateKeyVerify(util.getPrivateKey().slice(1)), false)
   })
 
   it('zero key', function () {

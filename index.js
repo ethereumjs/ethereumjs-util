@@ -1,12 +1,4 @@
 const { keccak224, keccak384, keccak256: k256, keccak512 } = require('ethereum-cryptography/keccak')
-const {
-  privateKeyVerify,
-  publicKeyCreate,
-  publicKeyVerify,
-  publicKeyConvert,
-  ecdsaSign
-} = require('ethereum-cryptography/secp256k1')
-const { ecdsaRecover } = require('ethereum-cryptography/secp256k1')
 const secp256k1 = require('./secp256k1-adapter')
 const assert = require('assert')
 const rlp = require('rlp')
@@ -315,11 +307,7 @@ exports.rlphash = function (a) {
  * @return {Boolean}
  */
 exports.isValidPrivate = function (privateKey) {
-  try {
-    return privateKeyVerify(privateKey)
-  } catch (e) {
-    return false
-  }
+  return secp256k1.privateKeyVerify(privateKey)
 }
 
 /**
@@ -332,14 +320,14 @@ exports.isValidPrivate = function (privateKey) {
 exports.isValidPublic = function (publicKey, sanitize) {
   if (publicKey.length === 64) {
     // Convert to SEC1 for secp256k1
-    return publicKeyVerify(Buffer.concat([ Buffer.from([4]), publicKey ]))
+    return secp256k1.publicKeyVerify(Buffer.concat([ Buffer.from([4]), publicKey ]))
   }
 
   if (!sanitize) {
     return false
   }
 
-  return publicKeyVerify(publicKey)
+  return secp256k1.publicKeyVerify(publicKey)
 }
 
 /**
@@ -352,7 +340,7 @@ exports.isValidPublic = function (publicKey, sanitize) {
 exports.pubToAddress = exports.publicToAddress = function (pubKey, sanitize) {
   pubKey = exports.toBuffer(pubKey)
   if (sanitize && (pubKey.length !== 64)) {
-    pubKey = Buffer.from(publicKeyConvert(pubKey, false)).slice(1)
+    pubKey = secp256k1.publicKeyConvert(pubKey, false).slice(1)
   }
   assert(pubKey.length === 64)
   // Only take the lower 160bits of the hash
@@ -367,7 +355,7 @@ exports.pubToAddress = exports.publicToAddress = function (pubKey, sanitize) {
 const privateToPublic = exports.privateToPublic = function (privateKey) {
   privateKey = exports.toBuffer(privateKey)
   // skip the type flag and use the X, Y points
-  return Buffer.from(publicKeyCreate(privateKey, false)).slice(1)
+  return secp256k1.publicKeyCreate(privateKey, false).slice(1)
 }
 
 /**
@@ -378,7 +366,7 @@ const privateToPublic = exports.privateToPublic = function (privateKey) {
 exports.importPublic = function (publicKey) {
   publicKey = exports.toBuffer(publicKey)
   if (publicKey.length !== 64) {
-    publicKey = Buffer.from(publicKeyConvert(publicKey, false)).slice(1)
+    publicKey = secp256k1.publicKeyConvert(publicKey, false).slice(1)
   }
   return publicKey
 }
@@ -390,12 +378,12 @@ exports.importPublic = function (publicKey) {
  * @return {Object}
  */
 exports.ecsign = function (msgHash, privateKey) {
-  const sig = ecdsaSign(msgHash, privateKey)
+  const sig = secp256k1.sign(msgHash, privateKey)
 
   const ret = {}
-  ret.r = Buffer.from(sig.signature).slice(0, 32)
-  ret.s = Buffer.from(sig.signature).slice(32, 64)
-  ret.v = sig.recid + 27
+  ret.r = sig.signature.slice(0, 32)
+  ret.s = sig.signature.slice(32, 64)
+  ret.v = sig.recovery + 27
   return ret
 }
 
@@ -426,8 +414,8 @@ exports.ecrecover = function (msgHash, v, r, s) {
   if (recovery !== 0 && recovery !== 1) {
     throw new Error('Invalid signature v value')
   }
-  const senderPubKey = ecdsaRecover(signature, recovery, msgHash)
-  return Buffer.from(publicKeyConvert(senderPubKey, false)).slice(1)
+  const senderPubKey = secp256k1.recover(msgHash, signature, recovery)
+  return secp256k1.publicKeyConvert(senderPubKey, false).slice(1)
 }
 
 /**
