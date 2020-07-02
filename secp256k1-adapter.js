@@ -1,7 +1,7 @@
 import * as secp256k1 from 'ethereum-cryptography/secp256k1'
 
-const wrapper = require('./lib/secp256k1')
-const der = require('./lib/der')
+const secp256k1v3 = require('./secp256k1-lib/index')
+const der = require('./secp256k1-lib/der')
 
 const privateKeyVerify = function (privateKey) {
   return secp256k1.privateKeyVerify(Uint8Array.from(privateKey))
@@ -12,7 +12,7 @@ const privateKeyExport = function (privateKey, compressed) {
     throw new RangeError('private key length is invalid')
   }
 
-  const publicKey = wrapper.privateKeyExport(privateKey, compressed)
+  const publicKey = secp256k1v3.privateKeyExport(privateKey, compressed)
 
   return der.privateKeyExport(privateKey, publicKey, compressed)
 }
@@ -35,7 +35,7 @@ const privateKeyModInverse = function (privateKey) {
     throw new Error('private key length is invalid')
   }
 
-  return Buffer.from(wrapper.privateKeyModInverse(Uint8Array.from(privateKey)))
+  return Buffer.from(secp256k1v3.privateKeyModInverse(Uint8Array.from(privateKey)))
 }
 
 const privateKeyTweakAdd = function (privateKey, tweak) {
@@ -107,7 +107,7 @@ const signatureImportLax = function (signature) {
     throw new Error("couldn't parse DER signature")
   }
 
-  return wrapper.signatureImport(sigObj)
+  return secp256k1v3.signatureImport(sigObj)
 }
 
 const sign = function (message, privateKey, options) {
@@ -193,7 +193,7 @@ const ecdhUnsafe = function (publicKey, privateKey, compressed) {
   }
 
   return Buffer.from(
-    wrapper.ecdhUnsafe(Uint8Array.from(publicKey), Uint8Array.from(privateKey), compressed)
+    secp256k1v3.ecdhUnsafe(Uint8Array.from(publicKey), Uint8Array.from(privateKey), compressed)
   )
 }
 

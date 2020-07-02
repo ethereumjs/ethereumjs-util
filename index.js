@@ -7,7 +7,7 @@ const {
   ecdsaSign
 } = require('ethereum-cryptography/secp256k1')
 const { ecdsaRecover } = require('ethereum-cryptography/secp256k1')
-const secp256k1 = require('./crypto')
+const secp256k1 = require('./secp256k1-adapter')
 const assert = require('assert')
 const rlp = require('rlp')
 const BN = require('bn.js')

@@ -1634,7 +1634,7 @@ describe('ecdh', function () {
   })
 })
 
-describe('ecdhUnsafeUnsafe', function () {
+describe('ecdhUnsafe', function () {
   it('public key should be a Buffer', function () {
     assert.throws(function () {
       const privateKey = util.getPrivateKey()

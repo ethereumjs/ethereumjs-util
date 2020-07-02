@@ -1,3 +1,6 @@
+// This file is imported from secp256k1 v3
+// https://github.com/cryptocoinjs/secp256k1-node/blob/master/LICENSE
+
 const BN = require('bn.js')
 const EC = require('elliptic').ec
 const ec = new EC('secp256k1')

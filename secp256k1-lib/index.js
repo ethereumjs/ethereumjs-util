@@ -1,3 +1,6 @@
+// This file is imported from secp256k1 v3
+// https://github.com/cryptocoinjs/secp256k1-node/blob/master/LICENSE
+
 const BN = require('bn.js')
 const EC = require('elliptic').ec
 
@@ -7,7 +10,7 @@ const ecparams = ec.curve
 exports.privateKeyExport = function (privateKey, compressed) {
   const d = new BN(privateKey)
   if (d.ucmp(ecparams.n) >= 0) {
-    throw new Error('private was invalid, try again')
+    throw new Error('couldn\'t export to DER format')
   }
 
   const point = ec.g.mul(d)
