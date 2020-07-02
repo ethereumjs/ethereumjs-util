@@ -84,7 +84,7 @@ describe('privateKeyImport', function () {
 })
 
 describe('privateKeyExport/privateKeyImport', function () {
-  it('export/import', function() {
+  it('export/import', function () {
     const privateKeys = util.getPrivateKeys(10)
 
     privateKeys.forEach((privateKey) => {
@@ -647,7 +647,6 @@ describe('publicKeyTweakMul', function () {
       const tweak = util.getTweak()
       const publicPoint = util.ec.g.mul(new BN(privateKey))
       const publicKey = Buffer.from(publicPoint.encode(null, true))
-      const expected = util.ec.g.mul(new BN(tweak)).add(publicPoint)
 
       if (new BN(tweak).cmp(util.BN_ZERO) === 0) {
         assert.throws(function () {
@@ -819,7 +818,6 @@ describe('signatureExport', function () {
       ethUtils.secp256k1.signatureExport(signature)
     })
   })
-
 })
 
 describe('signatureImport', function () {
@@ -841,7 +839,6 @@ describe('signatureImport', function () {
       ethUtils.secp256k1.signatureImport(signature)
     })
   })
-
 })
 
 describe('signatureImportLax', function () {
@@ -970,7 +967,6 @@ describe('ecdh', function () {
     })
   })
 })
-
 
 describe('ecdhUnsafe', function () {
   it('public key should be a Buffer', function () {
@@ -1149,7 +1145,6 @@ describe('sign', function () {
     }
     ethUtils.secp256k1.sign(message, privateKey, { data: data, noncefn: noncefn })
   })
-
 })
 
 describe('verify', function () {
@@ -1234,7 +1229,6 @@ describe('verify', function () {
       ethUtils.secp256k1.verify(message, signature, publicKey)
     })
   })
-
 })
 
 describe('recover', function () {
