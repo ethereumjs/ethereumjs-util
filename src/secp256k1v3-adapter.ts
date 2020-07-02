@@ -1,6 +1,6 @@
 import * as secp256k1 from 'ethereum-cryptography/secp256k1'
-const wrapper = require('./lib/secp256k1')
-const der = require('./lib/der')
+const wrapper = require('./secp256k1v3-lib/index')
+const der = require('./secp256k1v3-lib/der')
 
 export interface SignOptions {
   data?: Buffer

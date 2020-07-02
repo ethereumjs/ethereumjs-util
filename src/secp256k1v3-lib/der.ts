@@ -1,4 +1,7 @@
-import { SigObj } from './secp256k1'
+// This file is imported from secp256k1 v3
+// https://github.com/cryptocoinjs/secp256k1-node/blob/master/LICENSE
+
+import { SigObj } from './index'
 
 const EC_PRIVKEY_EXPORT_DER_COMPRESSED = Buffer.from([
   // begin
