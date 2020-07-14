@@ -24,7 +24,14 @@ export interface SignOptionsV4 {
   ) => Uint8Array
 }
 
+/**
+ * Verify an ECDSA privateKey
+ * @method privateKeyVerify
+ * @param {Buffer} privateKey
+ * @return {boolean}
+ */
 export const privateKeyVerify = function(privateKey: Buffer): boolean {
+  // secp256k1 v4 version throws when privateKey length is not 32
   if (privateKey.length !== 32) {
     return false
   }
@@ -32,7 +39,15 @@ export const privateKeyVerify = function(privateKey: Buffer): boolean {
   return secp256k1.privateKeyVerify(Uint8Array.from(privateKey))
 }
 
+/**
+ * Export a privateKey in DER format
+ * @method privateKeyExport
+ * @param {Buffer} privateKey
+ * @param {boolean} compressed
+ * @return {boolean}
+ */
 export const privateKeyExport = function(privateKey: Buffer, compressed?: boolean): Buffer {
+  // secp256k1 v4 version throws when privateKey length is not 32
   if (privateKey.length !== 32) {
     throw new RangeError('private key length is invalid')
   }
@@ -42,7 +57,15 @@ export const privateKeyExport = function(privateKey: Buffer, compressed?: boolea
   return der.privateKeyExport(privateKey, publicKey, compressed)
 }
 
+/**
+ * Import a privateKey in DER format
+ * @method privateKeyImport
+ * @param {Buffer} privateKey
+ * @return {Buffer}
+ */
 export const privateKeyImport = function(privateKey: Buffer): Buffer {
+  // privateKeyImport method is not part of secp256k1 v4 package
+  // this implementation is based on v3
   privateKey = der.privateKeyImport(privateKey)
   if (privateKey !== null && privateKey.length === 32 && privateKeyVerify(privateKey)) {
     return privateKey
@@ -51,10 +74,22 @@ export const privateKeyImport = function(privateKey: Buffer): Buffer {
   throw new Error("couldn't import from DER format")
 }
 
+/**
+ * Negate a privateKey by subtracting it from the order of the curve's base point
+ * @method privateKeyNegate
+ * @param {Buffer} privateKey
+ * @return {Buffer}
+ */
 export const privateKeyNegate = function(privateKey: Buffer): Buffer {
   return Buffer.from(secp256k1.privateKeyNegate(Uint8Array.from(privateKey)))
 }
 
+/**
+ * Compute the inverse of a privateKey (modulo the order of the curve's base point).
+ * @method privateKeyModInverse
+ * @param {Buffer} privateKey
+ * @return {Buffer}
+ */
 export const privateKeyModInverse = function(privateKey: Buffer): Buffer {
   if (privateKey.length !== 32) {
     throw new Error('private key length is invalid')
@@ -63,25 +98,60 @@ export const privateKeyModInverse = function(privateKey: Buffer): Buffer {
   return Buffer.from(secp256k1v3.privateKeyModInverse(Uint8Array.from(privateKey)))
 }
 
+/**
+ * Tweak a privateKey by adding tweak to it.
+ * @method privateKeyTweakAdd
+ * @param {Buffer} privateKey
+ * @param {Buffer} tweak
+ * @return {Buffer}
+ */
 export const privateKeyTweakAdd = function(privateKey: Buffer, tweak: Buffer): Buffer {
   return Buffer.from(secp256k1.privateKeyTweakAdd(Uint8Array.from(privateKey), tweak))
 }
 
+/**
+ * Tweak a privateKey by multiplying it by a tweak.
+ * @method privateKeyTweakMul
+ * @param {Buffer} privateKey
+ * @param {Buffer} tweak
+ * @return {Buffer}
+ */
 export const privateKeyTweakMul = function(privateKey: Buffer, tweak: Buffer): Buffer {
   return Buffer.from(
     secp256k1.privateKeyTweakMul(Uint8Array.from(privateKey), Uint8Array.from(tweak)),
   )
 }
 
+/**
+ * Compute the public key for a privateKey.
+ * @method publicKeyCreate
+ * @param {Buffer} privateKey
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 export const publicKeyCreate = function(privateKey: Buffer, compressed?: boolean): Buffer {
   return Buffer.from(secp256k1.publicKeyCreate(Uint8Array.from(privateKey), compressed))
 }
 
+/**
+ * Convert a publicKey to compressed or uncompressed form.
+ * @method publicKeyConvert
+ * @param {Buffer} publicKey
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 export const publicKeyConvert = function(publicKey: Buffer, compressed?: boolean): Buffer {
   return Buffer.from(secp256k1.publicKeyConvert(Uint8Array.from(publicKey), compressed))
 }
 
+/**
+ * Verify an ECDSA publicKey.
+ * @method publicKeyVerify
+ * @param {Buffer} publicKey
+ * @return {boolean}
+ */
 export const publicKeyVerify = function(publicKey: Buffer): boolean {
+  // secp256k1 v4 version throws when publicKey length is not 33 or 65
   if (publicKey.length !== 33 && publicKey.length !== 65) {
     return false
   }
@@ -89,6 +159,14 @@ export const publicKeyVerify = function(publicKey: Buffer): boolean {
   return secp256k1.publicKeyVerify(Uint8Array.from(publicKey))
 }
 
+/**
+ * Tweak a publicKey by adding tweak times the generator to it.
+ * @method publicKeyTweakAdd
+ * @param {Buffer} publicKey
+ * @param {Buffer} tweak
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 export const publicKeyTweakAdd = function(
   publicKey: Buffer,
   tweak: Buffer,
@@ -99,6 +177,14 @@ export const publicKeyTweakAdd = function(
   )
 }
 
+/**
+ * Tweak a publicKey by multiplying it by a tweak value
+ * @method publicKeyTweakMul
+ * @param {Buffer} publicKey
+ * @param {Buffer} tweak
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 export const publicKeyTweakMul = function(
   publicKey: Buffer,
   tweak: Buffer,
@@ -109,6 +195,13 @@ export const publicKeyTweakMul = function(
   )
 }
 
+/**
+ * Add a given publicKeys together.
+ * @method publicKeyCombine
+ * @param {Array<Buffer>} publicKeys
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 export const publicKeyCombine = function(publicKeys: Buffer[], compressed?: boolean): Buffer {
   const keys: Uint8Array[] = []
   publicKeys.forEach((publicKey: Buffer) => {
@@ -118,19 +211,46 @@ export const publicKeyCombine = function(publicKeys: Buffer[], compressed?: bool
   return Buffer.from(secp256k1.publicKeyCombine(keys, compressed))
 }
 
+/**
+ * Convert a signature to a normalized lower-S form.
+ * @method signatureNormalize
+ * @param {Buffer} signature
+ * @return {Buffer}
+ */
 export const signatureNormalize = function(signature: Buffer): Buffer {
   return Buffer.from(secp256k1.signatureNormalize(Uint8Array.from(signature)))
 }
 
+/**
+ * Serialize an ECDSA signature in DER format.
+ * @method signatureExport
+ * @param {Buffer} signature
+ * @return {Buffer}
+ */
 export const signatureExport = function(signature: Buffer): Buffer {
   return Buffer.from(secp256k1.signatureExport(Uint8Array.from(signature)))
 }
 
+/**
+ * Parse a DER ECDSA signature (follow by [BIP66](https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki)).
+ * @method signatureImport
+ * @param {Buffer} signature
+ * @return {Buffer}
+ */
 export const signatureImport = function(signature: Buffer): Buffer {
   return Buffer.from(secp256k1.signatureImport(Uint8Array.from(signature)))
 }
 
+/**
+ * Parse a DER ECDSA signature (not follow by [BIP66](https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki)).
+ * @method signatureImportLax
+ * @param {Buffer} signature
+ * @return {Buffer}
+ */
 export const signatureImportLax = function(signature: Buffer): Buffer {
+  // signatureImportLax method is not part of secp256k1 v4 package
+  // this implementation is based on v3
+  // ensure that signature is greater than 0
   if (signature.length === 0) {
     throw new RangeError('signature length is invalid')
   }
@@ -143,6 +263,14 @@ export const signatureImportLax = function(signature: Buffer): Buffer {
   return secp256k1v3.signatureImport(sigObj)
 }
 
+/**
+ * Create an ECDSA signature. Always return low-S signature.
+ * @method sign
+ * @param {Buffer} message
+ * @param {Buffer} privateKey
+ * @param {Object} options
+ * @return {Buffer}
+ */
 export const sign = function(
   message: Buffer,
   privateKey: Buffer,
@@ -158,6 +286,7 @@ export const sign = function(
     signOptions = {}
 
     if (options.data === null) {
+      // validate option.data length
       throw new TypeError('options.data should be a Buffer')
     }
 
@@ -174,6 +303,7 @@ export const sign = function(
     }
 
     if (options.noncefn) {
+      // convert option.noncefn function signature
       signOptions.noncefn = (
         message: Uint8Array,
         privateKey: Uint8Array,
@@ -213,10 +343,27 @@ export const sign = function(
   }
 }
 
+/**
+ * Verify an ECDSA signature.
+ * @method verify
+ * @param {Buffer} message
+ * @param {Buffer} signature
+ * @param {Buffer} publicKey
+ * @return {boolean}
+ */
 export const verify = function(message: Buffer, signature: Buffer, publicKey: Buffer): boolean {
   return secp256k1.ecdsaVerify(Uint8Array.from(signature), Uint8Array.from(message), publicKey)
 }
 
+/**
+ * Recover an ECDSA public key from a signature.
+ * @method recover
+ * @param {Buffer} message
+ * @param {Buffer} signature
+ * @param {Number} recid
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 export const recover = function(
   message: Buffer,
   signature: Buffer,
@@ -228,7 +375,15 @@ export const recover = function(
   )
 }
 
+/**
+ * Compute an EC Diffie-Hellman secret and applied sha256 to compressed public key.
+ * @method ecdh
+ * @param {Buffer} publicKey
+ * @param {Buffer} privateKey
+ * @return {Buffer}
+ */
 export const ecdh = function(publicKey: Buffer, privateKey: Buffer): Buffer {
+  // note: secp256k1 v3 doesn't allow optional parameter
   return Buffer.from(secp256k1.ecdh(Uint8Array.from(publicKey), Uint8Array.from(privateKey), {}))
 }
 
@@ -237,10 +392,14 @@ export const ecdhUnsafe = function(
   privateKey: Buffer,
   compressed?: boolean,
 ): Buffer {
+  // ecdhUnsafe method is not part of secp256k1 v4 package
+  // this implementation is based on v3
+  // ensure valid publicKey length
   if (publicKey.length !== 33 && publicKey.length !== 65) {
     throw new RangeError('public key length is invalid')
   }
 
+  // ensure valid privateKey length
   if (privateKey.length !== 32) {
     throw new RangeError('private key length is invalid')
   }
