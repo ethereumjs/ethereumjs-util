@@ -1,4 +1,4 @@
-import * as secp256k1 from 'ethereum-cryptography/secp256k1'
+const secp256k1 = require('ethereum-cryptography/secp256k1')
 const secp256k1v3 = require('./secp256k1v3-lib/index')
 const der = require('./secp256k1v3-lib/der')
 
@@ -11,6 +11,17 @@ export interface SignOptions {
     data: Buffer | null,
     attempt: number,
   ) => Buffer
+}
+
+export interface SignOptionsV4 {
+  data?: Uint8Array
+  noncefn?: (
+    message: Uint8Array,
+    privateKey: Uint8Array,
+    algo: Uint8Array | null,
+    data: Uint8Array | null,
+    attempt: number,
+  ) => Uint8Array
 }
 
 export const privateKeyVerify = function(privateKey: Buffer): boolean {
@@ -141,7 +152,7 @@ export const sign = function(
     throw new TypeError('options should be an Object')
   }
 
-  let signOptions: secp256k1.SignOptions | undefined = undefined
+  let signOptions: SignOptionsV4 | undefined = undefined
 
   if (options) {
     signOptions = {}
