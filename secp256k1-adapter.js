@@ -1,4 +1,4 @@
-import * as secp256k1 from 'ethereum-cryptography/secp256k1'
+const secp256k1 = require('ethereum-cryptography/secp256k1')
 
 const secp256k1v3 = require('./secp256k1-lib/index')
 const der = require('./secp256k1-lib/der')
