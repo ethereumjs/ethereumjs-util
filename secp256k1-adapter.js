@@ -3,7 +3,14 @@ const secp256k1 = require('ethereum-cryptography/secp256k1')
 const secp256k1v3 = require('./secp256k1-lib/index')
 const der = require('./secp256k1-lib/der')
 
+/**
+ * Verify an ECDSA privateKey
+ * @method privateKeyVerify
+ * @param {Buffer} privateKey
+ * @return {boolean}
+ */
 const privateKeyVerify = function (privateKey) {
+  // secp256k1 v4 version throws when privateKey length is not 32
   if (privateKey.length !== 32) {
     return false
   }
@@ -11,7 +18,16 @@ const privateKeyVerify = function (privateKey) {
   return secp256k1.privateKeyVerify(Uint8Array.from(privateKey))
 }
 
+/**
+ * Export a privateKey in DER format
+ * @method privateKeyExport
+ * @param {Buffer} privateKey
+ * @param {boolean} compressed
+ * @return {boolean}
+ */
 const privateKeyExport = function (privateKey, compressed) {
+  // privateKeyExport method is not part of secp256k1 v4 package
+  // this implementation is based on v3
   if (privateKey.length !== 32) {
     throw new RangeError('private key length is invalid')
   }
@@ -21,7 +37,16 @@ const privateKeyExport = function (privateKey, compressed) {
   return der.privateKeyExport(privateKey, publicKey, compressed)
 }
 
+/**
+ * Import a privateKey in DER format
+ * @method privateKeyImport
+ * @param {Buffer} privateKey
+ * @return {Buffer}
+ */
+
 const privateKeyImport = function (privateKey) {
+  // privateKeyImport method is not part of secp256k1 v4 package
+  // this implementation is based on v3
   privateKey = der.privateKeyImport(privateKey)
   if (privateKey !== null && privateKey.length === 32 && privateKeyVerify(privateKey)) {
     return privateKey
@@ -30,10 +55,22 @@ const privateKeyImport = function (privateKey) {
   throw new Error("couldn't import from DER format")
 }
 
+/**
+ * Negate a privateKey by subtracting it from the order of the curve's base point
+ * @method privateKeyNegate
+ * @param {Buffer} privateKey
+ * @return {Buffer}
+ */
 const privateKeyNegate = function (privateKey) {
   return Buffer.from(secp256k1.privateKeyNegate(Uint8Array.from(privateKey)))
 }
 
+/**
+ * Compute the inverse of a privateKey (modulo the order of the curve's base point).
+ * @method privateKeyModInverse
+ * @param {Buffer} privateKey
+ * @return {Buffer}
+ */
 const privateKeyModInverse = function (privateKey) {
   if (privateKey.length !== 32) {
     throw new Error('private key length is invalid')
@@ -42,25 +79,60 @@ const privateKeyModInverse = function (privateKey) {
   return Buffer.from(secp256k1v3.privateKeyModInverse(Uint8Array.from(privateKey)))
 }
 
+/**
+ * Tweak a privateKey by adding tweak to it.
+ * @method privateKeyTweakAdd
+ * @param {Buffer} privateKey
+ * @param {Buffer} tweak
+ * @return {Buffer}
+ */
 const privateKeyTweakAdd = function (privateKey, tweak) {
   return Buffer.from(secp256k1.privateKeyTweakAdd(Uint8Array.from(privateKey), tweak))
 }
 
+/**
+ * Tweak a privateKey by multiplying it by a tweak.
+ * @method privateKeyTweakMul
+ * @param {Buffer} privateKey
+ * @param {Buffer} tweak
+ * @return {Buffer}
+ */
 const privateKeyTweakMul = function (privateKey, tweak) {
   return Buffer.from(
     secp256k1.privateKeyTweakMul(Uint8Array.from(privateKey), Uint8Array.from(tweak))
   )
 }
 
+/**
+ * Compute the public key for a privateKey.
+ * @method publicKeyCreate
+ * @param {Buffer} privateKey
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 const publicKeyCreate = function (privateKey, compressed) {
   return Buffer.from(secp256k1.publicKeyCreate(Uint8Array.from(privateKey), compressed))
 }
 
+/**
+ * Convert a publicKey to compressed or uncompressed form.
+ * @method publicKeyConvert
+ * @param {Buffer} publicKey
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 const publicKeyConvert = function (publicKey, compressed) {
   return Buffer.from(secp256k1.publicKeyConvert(Uint8Array.from(publicKey), compressed))
 }
 
+/**
+ * Verify an ECDSA publicKey.
+ * @method publicKeyVerify
+ * @param {Buffer} publicKey
+ * @return {boolean}
+ */
 const publicKeyVerify = function (publicKey) {
+  // secp256k1 v4 version throws when publicKey length is not 33 or 65
   if (publicKey.length !== 33 && publicKey.length !== 65) {
     return false
   }
@@ -68,18 +140,41 @@ const publicKeyVerify = function (publicKey) {
   return secp256k1.publicKeyVerify(Uint8Array.from(publicKey))
 }
 
+/**
+ * Tweak a publicKey by adding tweak times the generator to it.
+ * @method publicKeyTweakAdd
+ * @param {Buffer} publicKey
+ * @param {Buffer} tweak
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 const publicKeyTweakAdd = function (publicKey, tweak, compressed) {
   return Buffer.from(
     secp256k1.publicKeyTweakAdd(Uint8Array.from(publicKey), Uint8Array.from(tweak), compressed)
   )
 }
 
+/**
+ * Tweak a publicKey by multiplying it by a tweak value
+ * @method publicKeyTweakMul
+ * @param {Buffer} publicKey
+ * @param {Buffer} tweak
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 const publicKeyTweakMul = function (publicKey, tweak, compressed) {
   return Buffer.from(
     secp256k1.publicKeyTweakMul(Uint8Array.from(publicKey), Uint8Array.from(tweak), compressed)
   )
 }
 
+/**
+ * Add a given publicKeys together.
+ * @method publicKeyCombine
+ * @param {Array<Buffer>} publicKeys
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 const publicKeyCombine = function (publicKeys, compressed) {
   const keys = []
   publicKeys.forEach((publicKey) => {
@@ -89,19 +184,46 @@ const publicKeyCombine = function (publicKeys, compressed) {
   return Buffer.from(secp256k1.publicKeyCombine(keys, compressed))
 }
 
+/**
+ * Convert a signature to a normalized lower-S form.
+ * @method signatureNormalize
+ * @param {Buffer} signature
+ * @return {Buffer}
+ */
 const signatureNormalize = function (signature) {
   return Buffer.from(secp256k1.signatureNormalize(Uint8Array.from(signature)))
 }
 
+/**
+ * Serialize an ECDSA signature in DER format.
+ * @method signatureExport
+ * @param {Buffer} signature
+ * @return {Buffer}
+ */
 const signatureExport = function (signature) {
   return Buffer.from(secp256k1.signatureExport(Uint8Array.from(signature)))
 }
 
+/**
+ * Parse a DER ECDSA signature (follow by [BIP66](https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki)).
+ * @method signatureImport
+ * @param {Buffer} signature
+ * @return {Buffer}
+ */
 const signatureImport = function (signature) {
   return Buffer.from(secp256k1.signatureImport(Uint8Array.from(signature)))
 }
 
+/**
+ * Parse a DER ECDSA signature (not follow by [BIP66](https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki)).
+ * @method signatureImportLax
+ * @param {Buffer} signature
+ * @return {Buffer}
+ */
 const signatureImportLax = function (signature) {
+  // signatureImportLax method is not part of secp256k1 v4 package
+  // this implementation is based on v3
+  // ensure that signature is greater than 0
   if (signature.length === 0) {
     throw new RangeError('signature length is invalid')
   }
@@ -114,6 +236,14 @@ const signatureImportLax = function (signature) {
   return secp256k1v3.signatureImport(sigObj)
 }
 
+/**
+ * Create an ECDSA signature. Always return low-S signature.
+ * @method sign
+ * @param {Buffer} message
+ * @param {Buffer} privateKey
+ * @param {Object} options
+ * @return {Buffer}
+ */
 const sign = function (message, privateKey, options) {
   if (options === null) {
     throw new TypeError('options should be an Object')
@@ -129,6 +259,7 @@ const sign = function (message, privateKey, options) {
     }
 
     if (options.data) {
+      // validate option.data length
       if (options.data.length !== 32) {
         throw new RangeError('options.data length is invalid')
       }
@@ -141,6 +272,7 @@ const sign = function (message, privateKey, options) {
     }
 
     if (options.noncefn) {
+      //  convert option.noncefn function signature
       signOptions.noncefn = (message, privateKey, algo, data, attempt) => {
         const bufferAlgo = algo != null ? Buffer.from(algo) : null
         const bufferData = data != null ? Buffer.from(data) : null
@@ -156,7 +288,7 @@ const sign = function (message, privateKey, options) {
           )
         }
 
-        return new Uint8Array(buffer)
+        return Uint8Array.from(buffer)
       }
     }
   }
@@ -173,25 +305,64 @@ const sign = function (message, privateKey, options) {
   }
 }
 
+/**
+ * Verify an ECDSA signature.
+ * @method verify
+ * @param {Buffer} message
+ * @param {Buffer} signature
+ * @param {Buffer} publicKey
+ * @return {boolean}
+ */
 const verify = function (message, signature, publicKey) {
+  // note: secp256k1 v4 verify method has a different argument order
   return secp256k1.ecdsaVerify(Uint8Array.from(signature), Uint8Array.from(message), publicKey)
 }
 
+/**
+ * Recover an ECDSA public key from a signature.
+ * @method recover
+ * @param {Buffer} message
+ * @param {Buffer} signature
+ * @param {Number} recid
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 const recover = function (message, signature, recid, compressed) {
+  // note: secp256k1 v4 recover method has a different argument order
   return Buffer.from(
     secp256k1.ecdsaRecover(Uint8Array.from(signature), recid, Uint8Array.from(message), compressed)
   )
 }
 
+/**
+ * Compute an EC Diffie-Hellman secret and applied sha256 to compressed public key.
+ * @method ecdh
+ * @param {Buffer} publicKey
+ * @param {Buffer} privateKey
+ * @return {Buffer}
+ */
 const ecdh = function (publicKey, privateKey) {
+  // note: secp256k1 v3 doesn't allow optional parameter
   return Buffer.from(secp256k1.ecdh(Uint8Array.from(publicKey), Uint8Array.from(privateKey), {}))
 }
 
+/**
+ * Compute an EC Diffie-Hellman secret and return public key as result
+ * @method ecdhUnsafe
+ * @param {Buffer} publicKey
+ * @param {Buffer} privateKey
+ * @param {boolean} compressed
+ * @return {Buffer}
+ */
 const ecdhUnsafe = function (publicKey, privateKey, compressed) {
+  // ecdhUnsafe method is not part of secp256k1 v4 package
+  // this implementation is based on v3
+  // ensure valid publicKey length
   if (publicKey.length !== 33 && publicKey.length !== 65) {
     throw new RangeError('public key length is invalid')
   }
 
+  // ensure valid privateKey length
   if (privateKey.length !== 32) {
     throw new RangeError('private key length is invalid')
   }
