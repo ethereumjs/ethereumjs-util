@@ -1,5 +1,5 @@
-const createKeccakHash = require('keccak')
-const secp256k1 = require('secp256k1')
+const { keccak224, keccak384, keccak256: k256, keccak512 } = require('ethereum-cryptography/keccak')
+const secp256k1 = require('./secp256k1-adapter')
 const assert = require('assert')
 const rlp = require('rlp')
 const BN = require('bn.js')
@@ -230,7 +230,23 @@ exports.keccak = function (a, bits) {
   a = exports.toBuffer(a)
   if (!bits) bits = 256
 
-  return createKeccakHash('keccak' + bits).update(a).digest()
+  switch (bits) {
+    case 224: {
+      return keccak224(a)
+    }
+    case 256: {
+      return k256(a)
+    }
+    case 384: {
+      return keccak384(a)
+    }
+    case 512: {
+      return keccak512(a)
+    }
+    default: {
+      throw new Error(`Invald algorithm: keccak${bits}`)
+    }
+  }
 }
 
 /**
