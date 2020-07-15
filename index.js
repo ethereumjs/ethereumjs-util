@@ -1,5 +1,5 @@
-const SHA3 = require('keccakjs')
-const secp256k1 = require('secp256k1')
+const { keccak224, keccak384, keccak256: k256, keccak512 } = require('ethereum-cryptography/keccak')
+const secp256k1 = require('./secp256k1-adapter')
 const assert = require('assert')
 const rlp = require('rlp')
 const BN = require('bn.js')
@@ -250,11 +250,23 @@ exports.sha3 = function (a, bytes) {
   a = exports.toBuffer(a)
   if (!bytes) bytes = 256
 
-  var h = new SHA3(bytes)
-  if (a) {
-    h.update(a)
+  switch (bytes) {
+    case 224: {
+      return keccak224(a)
+    }
+    case 256: {
+      return k256(a)
+    }
+    case 384: {
+      return keccak384(a)
+    }
+    case 512: {
+      return keccak512(a)
+    }
+    default: {
+      throw new Error(`Invalid algorithm: keccak${bytes}`)
+    }
   }
-  return new Buffer(h.digest('hex'), 'hex')
 }
 
 /**
