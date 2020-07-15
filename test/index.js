@@ -75,11 +75,37 @@ describe('is zero address', function () {
 })
 
 describe('keccak', function () {
-  it('should produce a hash', function () {
+  it('should produce a keccak224 hash', function() {
+    const msg = '0x3c9229289a6125f7fdf1885a77bb12c37a8d3b4962d936f7e3084dece32a3ca1'
+    const r = '9e66938bd8f32c8610444bb524630db496bd58b689f9733182df63ba'
+    const hash = ethUtils.keccak(msg, 224)
+    assert.equal(hash.toString('hex'), r)
+  })
+  it('should produce a keccak256 hash', function() {
     const msg = '0x3c9229289a6125f7fdf1885a77bb12c37a8d3b4962d936f7e3084dece32a3ca1'
     const r = '82ff40c0a986c6a5cfad4ddf4c3aa6996f1a7837f9c398e17e5de5cbd5a12b28'
     const hash = ethUtils.keccak(msg)
     assert.equal(hash.toString('hex'), r)
+  })
+  it('should produce a keccak384 hash', function() {
+    const msg = '0x3c9229289a6125f7fdf1885a77bb12c37a8d3b4962d936f7e3084dece32a3ca1'
+    const r =
+        '923e0f6a1c324a698139c3f3abbe88ac70bf2e7c02b26192c6124732555a32cef18e81ac91d5d97ce969745409c5bbc6'
+    const hash = ethUtils.keccak(msg, 384)
+    assert.equal(hash.toString('hex'), r)
+  })
+  it('should produce a keccak512 hash', function() {
+    const msg = '0x3c9229289a6125f7fdf1885a77bb12c37a8d3b4962d936f7e3084dece32a3ca1'
+    const r =
+        '36fdacd0339307068e9ed191773a6f11f6f9f99016bd50f87fd529ab7c87e1385f2b7ef1ac257cc78a12dcb3e5804254c6a7b404a6484966b831eadc721c3d24'
+    const hash = ethUtils.keccak(msg, 512)
+    assert.equal(hash.toString('hex'), r)
+  })
+  it('should error if provided incorrect bits', function() {
+    const msg = '0x3c9229289a6125f7fdf1885a77bb12c37a8d3b4962d936f7e3084dece32a3ca1'
+    assert.throws(function() {
+      ethUtils.keccak(msg, 1024)
+    })
   })
 })
 
@@ -614,6 +640,13 @@ describe('isValidSignature', function () {
 
     const r = Buffer.from('99e71a99cb2270b8cac5254f9e99b6210c6c10224a1579cf389ef88b20a1abe9', 'hex')
     const s = Buffer.from(SECP256K1_N_DIV_2.add(new BN('1', 16)).toString(16), 'hex')
+
+    const v = 27
+    assert.equal(ethUtils.isValidSignature(v, r, s, true), false)
+  })
+  it('should fail when s is 0 bytes', function () {
+    const r = Buffer.from('99e71a99cb2270b8cac5254f9e99b6210c6c10224a1579cf389ef88b20a1abe9', 'hex')
+    const s = Buffer.from('0000000000000000000000000000000000000000000000000000000000000000', 'hex')
 
     const v = 27
     assert.equal(ethUtils.isValidSignature(v, r, s, true), false)

@@ -1,4 +1,4 @@
-const secp256k1 = require('secp256k1')
+const secp256k1 = require('./secp256k1v3-adapter')
 const ethjsUtil = require('ethjs-util')
 import BN = require('bn.js')
 import rlp = require('rlp')

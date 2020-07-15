@@ -1,4 +1,4 @@
-const secp256k1 = require('secp256k1')
+const secp256k1 = require('./secp256k1v3-adapter')
 import BN = require('bn.js')
 import { toBuffer, setLength, setLengthLeft, bufferToHex } from './bytes'
 import { keccak } from './hash'
