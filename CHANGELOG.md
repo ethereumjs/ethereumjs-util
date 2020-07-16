@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 (modification: no type change headlines) and this project adheres to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [6.2.1] - 2020-07-17
+
+This release replaces the native `secp256k1` and `keccak` dependencies with
+[ethereum-cryptopgraphy](https://github.com/ethereum/js-ethereum-cryptography)
+which doesn't need native compilation.
+
+[6.2.1]: https://github.com/ethereumjs/ethereumjs-util/compare/v6.2.0...v6.2.1
+
 ## [6.2.0] - 2019-11-06
 
 This release comes with a new file structure, related functionality is now broken
