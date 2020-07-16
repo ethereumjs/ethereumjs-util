@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 
+## [5.2.1] - 2020-07-17
+
+This release replaces the native `secp256k1` and `keccak` dependencies with
+[ethereum-cryptopgraphy](https://github.com/ethereum/js-ethereum-cryptography)
+which doesn't need native compilation.
+
+[5.2.1]: https://github.com/ethereumjs/ethereumjs-util/compare/v5.2.0...v5.2.1
+
 ## [5.2.0] - 2018-04-27
 - Rename all ``sha3`` hash related constants and functions to ``keccak``, see
   [this](https://github.com/ethereum/EIPs/issues/59) EIP discussion for context
