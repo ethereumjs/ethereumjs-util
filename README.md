@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://github.com/ethereumjs/ethereumjs-monorepo/tree/master/packages/util">
+    <img src="https://user-images.githubusercontent.com/47108/78554503-42c47000-77d9-11ea-8935-2d93981d50df.png" width="309">
+  </a>
+</p>
+
 # SYNOPSIS
 
 [![NPM Status][npm-badge]][npm-link]
